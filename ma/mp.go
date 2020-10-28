@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -24,8 +24,8 @@ type Service interface {
 	GetQrCodeService() QrCodeService
 
 	// 执行http请求
-	get(v interface{}, url string, args ...interface{}) error
-	post(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error
+	get(url string, args ...interface{}) ([]byte, error)
+	post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error)
 }
 
 type ServiceImpl struct {
@@ -66,14 +66,14 @@ func (s *ServiceImpl) ForceGetAccessToken(forceRefresh bool) (*AccessToken, erro
 
 func (s *ServiceImpl) getAccessToken() (*AccessToken, error) {
 	var at AccessToken
-	err := s.get(&at, AccessTokenUrl, s.config.GetAppID(), s.config.GetSecret())
+	err := s.getFor(&at, AccessTokenUrl, s.config.GetAppID(), s.config.GetSecret())
 	at.Time = time.Now()
 	return &at, err
 }
 
 func (s *ServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error) {
 	var jsr JsCode2SessionResult
-	err := s.get(&jsr, SessionInfoUrl, s.config.GetAppID(), s.config.GetSecret(), jsCode)
+	err := s.getFor(&jsr, SessionInfoUrl, s.config.GetAppID(), s.config.GetSecret(), jsCode)
 	return &jsr, err
 }
 
@@ -85,43 +85,47 @@ func (s *ServiceImpl) GetQrCodeService() QrCodeService {
 	return s.qrCodeService
 }
 
-func (s *ServiceImpl) get(v interface{}, url string, args ...interface{}) error {
-	uri := fmt.Sprintf(url, args)
+func (s *ServiceImpl) get(url string, args ...interface{}) ([]byte, error) {
+	uri := fmt.Sprintf(url, args...)
 	res, err := http.Get(uri)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return s.convert(v, res.Body)
+	return ioutil.ReadAll(res.Body)
 }
 
-func (s *ServiceImpl) post(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error {
-	uri := fmt.Sprintf(url, args)
+func (s *ServiceImpl) post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
+	uri := fmt.Sprintf(url, args...)
 	body, err := json.Marshal(data)
 	res, err := http.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return s.convert(v, res.Body)
+	return ioutil.ReadAll(res.Body)
 }
 
-func (s ServiceImpl) convert(v interface{}, reader io.Reader) error {
-	body, err := ioutil.ReadAll(reader)
+func (s *ServiceImpl) getFor(v interface{}, url string, args ...interface{}) error {
+	res, err := s.get(url, args...)
 	if err != nil {
 		return err
 	}
-	switch v.(type) {
-	case []byte:
-		v = &body
-		return nil
-	case io.Reader:
-		v = reader
-		return nil
-	case struct{}:
-		err = json.Unmarshal(body, v)
+	return s.convert(v, res)
+}
+
+func (s *ServiceImpl) postFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error {
+	res, err := s.post(url, contentType, data, args...)
+	if err != nil {
 		return err
-	default:
-		return fmt.Errorf("不是 %s 或者 %s 类型", "struct{}", "[]byte")
 	}
+	return s.convert(v, res)
+}
+
+func (s *ServiceImpl) convert(v interface{}, body []byte) error {
+	if v != nil && reflect.ValueOf(v).Kind() == reflect.Ptr {
+		err := json.Unmarshal(body, v)
+		return err
+	}
+	return fmt.Errorf("对象不是结构体")
 }
 
 func NewService(appId, secret string) Service {

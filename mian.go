@@ -11,15 +11,15 @@ func main() {
 	secret := ""
 
 	service := ma.NewService(appId, secret)
-	at, err := service.GetAccessToken()
+
+	qc := service.GetQrCodeService()
+	bytes, err := qc.CreateQrcode("/pages/index")
 	if err == nil {
-		fmt.Println(at.AccessToken)
+		err = qc.(*ma.QrCodeServiceImpl).BytesToFile("tmp.jpg", bytes)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	} else {
 		fmt.Println(err.Error())
-	}
-
-	f, err := service.GetQrCodeService().CreateQrcode("/pages/index")
-	if err != nil {
-		fmt.Println(f)
 	}
 }
