@@ -1,8 +1,6 @@
 package ma
 
 import (
-	"encoding/json"
-	"fmt"
 	"wx-go/common"
 )
 
@@ -32,11 +30,8 @@ type WxMaServiceImpl struct {
 }
 
 func newService(appId, secret string) *WxMaServiceImpl {
-	impl := WxMaServiceImpl{
-		config: newWxMaConfig(appId, secret),
-	}
-	at, _ := impl.GetAccessToken()
-	impl.config.SetAccessToken(at)
+	impl := WxMaServiceImpl{}
+	impl.SetWxMaConfig(newWxMaConfig(appId, secret))
 	impl.userService = newWxMaUserService(&impl)
 	impl.qrCodeService = newWxMaQrcodeService(&impl)
 	return &impl
@@ -61,27 +56,9 @@ func (s *WxMaServiceImpl) GetWxMaConfig() WxMaConfig {
 }
 
 func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
+	s.SetWxConfig(config)
 	s.config = config
 	_, _ = s.ForceGetAccessToken(true)
-}
-
-func (s *WxMaServiceImpl) GetWxConfig() common.WxConfig {
-	return s.GetWxMaConfig()
-}
-
-func (s *WxMaServiceImpl) SetWxConfig(config common.WxConfig) {
-	var c WxMaConfigImpl
-	b, err := json.Marshal(config)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	err = json.Unmarshal(b, &c)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	s.SetWxMaConfig(&c)
 }
 
 func NewService(appId, secret string) WxMaService {

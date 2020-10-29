@@ -1,14 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"wx-go/ma"
 )
 
 func main() {
 
-	appId := ""
-	secret := ""
+	c := GetConfig()
+	appId := c.AppId
+	secret := c.Secret
 
 	service := ma.NewService(appId, secret)
 
@@ -22,4 +26,26 @@ func main() {
 	} else {
 		fmt.Println(err.Error())
 	}
+}
+
+type Config struct {
+	AppId  string `json:"app_id"`
+	Secret string `json:"secret"`
+}
+
+func GetConfig() Config {
+	f, err := os.Open("./config.json")
+	if err != nil {
+		panic(err)
+	}
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	var c Config
+	err = json.Unmarshal(b, &c)
+	if err != nil {
+		panic(err)
+	}
+	return c
 }

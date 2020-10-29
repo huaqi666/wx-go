@@ -111,6 +111,6 @@ func (s *WxServiceImpl) GetWxConfig() WxConfig {
 	return s.config
 }
 
-func (s WxServiceImpl) SetWxConfig(config WxConfig) {
+func (s *WxServiceImpl) SetWxConfig(config WxConfig) {
 	s.config = config
 }

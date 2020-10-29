@@ -3,8 +3,6 @@ package mp
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 	"wx-go/common"
@@ -41,11 +39,8 @@ type WxMpServiceImpl struct {
 }
 
 func newService(appId, secret string) *WxMpServiceImpl {
-	impl := WxMpServiceImpl{
-		config: newWxMpConfig(appId, secret),
-	}
-	at, _ := impl.GetAccessToken()
-	impl.config.SetAccessToken(at)
+	impl := WxMpServiceImpl{}
+	impl.SetWxMpConfig(newWxMpConfig(appId, secret))
 	impl.userService = newWxMpUserService(&impl)
 	impl.qrCodeService = newWxMpQrcodeService(&impl)
 	return &impl
@@ -75,27 +70,9 @@ func (s *WxMpServiceImpl) GetWxMpConfig() WxMpConfig {
 }
 
 func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
+	s.SetWxConfig(config)
 	s.config = config
 	_, _ = s.ForceGetAccessToken(true)
-}
-
-func (s *WxMpServiceImpl) GetWxConfig() common.WxConfig {
-	return s.GetWxMpConfig()
-}
-
-func (s *WxMpServiceImpl) SetWxConfig(config common.WxConfig) {
-	var c WxMpConfigImpl
-	b, err := json.Marshal(config)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	err = json.Unmarshal(b, &c)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	s.SetWxMpConfig(&c)
 }
 
 func NewService(appId, secret string) WxMpService {
