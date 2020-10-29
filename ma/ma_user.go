@@ -4,10 +4,10 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"strings"
-	"wx-go/common/utils"
+	"wx-go/common/util"
 )
 
-type UserService interface {
+type WxMaUserService interface {
 	// jsCode换取openid
 	GetSessionInfo(jsCode string) (*JsCode2SessionResult, error)
 	// 用户用户信息
@@ -43,33 +43,33 @@ type PhoneNumberInfo struct {
 	Watermark       Watermark `json:"watermark"`
 }
 
-type UserServiceImpl struct {
-	service Service
+type WxMaUserServiceImpl struct {
+	service WxMaService
 }
 
-func newUserService(service Service) UserService {
-	return &UserServiceImpl{
+func newWxMaUserService(service WxMaService) *WxMaUserServiceImpl {
+	return &WxMaUserServiceImpl{
 		service: service,
 	}
 }
 
-func (u *UserServiceImpl) GetSessionInfo(jsCode string) (*JsCode2SessionResult, error) {
+func (u *WxMaUserServiceImpl) GetSessionInfo(jsCode string) (*JsCode2SessionResult, error) {
 	return u.service.JsCode2SessionInfo(jsCode)
 }
 
-func (u *UserServiceImpl) GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error) {
+func (u *WxMaUserServiceImpl) GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error) {
 	var usrInfo UserInfo
-	err := utils.Decrypt(&usrInfo, sessionKey, encryptedData, ivStr)
+	err := util.Decrypt(&usrInfo, sessionKey, encryptedData, ivStr)
 	return &usrInfo, err
 }
 
-func (u *UserServiceImpl) GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
+func (u *WxMaUserServiceImpl) GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
 	var info PhoneNumberInfo
-	err := utils.Decrypt(&info, sessionKey, encryptedData, ivStr)
+	err := util.Decrypt(&info, sessionKey, encryptedData, ivStr)
 	return &info, err
 }
 
-func (u *UserServiceImpl) checkUserInfo(sessionKey, rawData, signature string) bool {
-	generatedSignature := sha1.Sum([]byte(rawData + sessionKey))
-	return strings.ToLower(hex.EncodeToString(generatedSignature[:])) == signature
+func (u *WxMaUserServiceImpl) checkUserInfo(sessionKey, rawData, signature string) bool {
+	sum := sha1.Sum([]byte(rawData + sessionKey))
+	return strings.ToLower(hex.EncodeToString(sum[:])) == signature
 }

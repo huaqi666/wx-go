@@ -1,41 +1,40 @@
 package ma
 
-type Config interface {
-	GetAppID() string
-	GetSecret() string
-	GetAccessToken() *AccessToken
-	SetAccessToken(at *AccessToken)
+import "wx-go/common"
+
+type WxMaConfig interface {
+	common.WxConfig
 }
 
-type ConfigImpl struct {
+type WxMaConfigImpl struct {
 	appId       string
 	secret      string
-	AccessToken *AccessToken
+	AccessToken *common.AccessToken
 
 	Token         string
 	AesKey        string
 	MsgDataFormat string
 }
 
-func newConfig(appId, secret string) Config {
-	return &ConfigImpl{
+func newWxMaConfig(appId, secret string) *WxMaConfigImpl {
+	return &WxMaConfigImpl{
 		appId:  appId,
 		secret: secret,
 	}
 }
 
-func (c *ConfigImpl) GetAppID() string {
+func (c *WxMaConfigImpl) GetAppID() string {
 	return c.appId
 }
 
-func (c *ConfigImpl) GetSecret() string {
+func (c *WxMaConfigImpl) GetSecret() string {
 	return c.secret
 }
 
-func (c *ConfigImpl) GetAccessToken() *AccessToken {
+func (c *WxMaConfigImpl) GetAccessToken() *common.AccessToken {
 	return c.AccessToken
 }
 
-func (c *ConfigImpl) SetAccessToken(at *AccessToken) {
+func (c *WxMaConfigImpl) SetAccessToken(at *common.AccessToken) {
 	c.AccessToken = at
 }

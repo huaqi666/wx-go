@@ -2,9 +2,10 @@ package ma
 
 import (
 	"io/ioutil"
+	"wx-go/common"
 )
 
-type QrCodeService interface {
+type WxMaQrcodeService interface {
 	// 获取小程序页面二维码.
 	// path 扫码进入的小程序页面路径，最大长度 128 字节，不能为空；对于小游戏，可以只传入 query 部分，来实现传参效果，如：传入 "?foo=bar"，即可在 wx.getLaunchOptionsSync 接口中的 query 参数获取到 {foo:"bar"}。
 	// width 二维码的宽度，单位 px。最小 280px，最大 1280px
@@ -66,33 +67,33 @@ func DefaultCodeLineColor() CodeLineColor {
 	return CodeLineColor{R: "0", B: "0", G: "0"}
 }
 
-type QrCodeServiceImpl struct {
-	service Service
+type WxMaQrCodeServiceImpl struct {
+	service WxMaService
 }
 
-func newQrCodeService(service Service) QrCodeService {
-	return &QrCodeServiceImpl{
+func newWxMaQrcodeService(service WxMaService) *WxMaQrCodeServiceImpl {
+	return &WxMaQrCodeServiceImpl{
 		service: service,
 	}
 }
 
-func (q *QrCodeServiceImpl) CreateQrcodeBytes(path string, width int) (bytes []byte, err error) {
+func (q *WxMaQrCodeServiceImpl) CreateQrcodeBytes(path string, width int) (bytes []byte, err error) {
 
 	data := map[string]interface{}{"path": path, "width": width}
 	at, err := q.service.GetAccessToken()
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.post(QrCodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.QrCodeUrl, "", data, at.AccessToken)
 	return
 }
 
-func (q *QrCodeServiceImpl) CreateQrcode(path string) ([]byte, error) {
+func (q *WxMaQrCodeServiceImpl) CreateQrcode(path string) ([]byte, error) {
 
 	return q.CreateQrcodeBytes(path, 430)
 }
 
-func (q *QrCodeServiceImpl) CreateWxaCodeBytes(path string, width int, autoColor bool, lineColor CodeLineColor, isTransparent bool) (bytes []byte, err error) {
+func (q *WxMaQrCodeServiceImpl) CreateWxaCodeBytes(path string, width int, autoColor bool, lineColor CodeLineColor, isTransparent bool) (bytes []byte, err error) {
 
 	data := WxaCode{
 		Path: path,
@@ -107,16 +108,16 @@ func (q *QrCodeServiceImpl) CreateWxaCodeBytes(path string, width int, autoColor
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.post(QrWxaCodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.QrWxaCodeUrl, "", data, at.AccessToken)
 	return
 }
 
-func (q *QrCodeServiceImpl) CreateWxaCode(path string) ([]byte, error) {
+func (q *WxMaQrCodeServiceImpl) CreateWxaCode(path string) ([]byte, error) {
 
 	return q.CreateWxaCodeBytes(path, 430, true, DefaultCodeLineColor(), false)
 }
 
-func (q *QrCodeServiceImpl) CreateWxaCodeUnlimitedBytes(scene, path string, width int, autoColor bool, lineColor CodeLineColor,
+func (q *WxMaQrCodeServiceImpl) CreateWxaCodeUnlimitedBytes(scene, path string, width int, autoColor bool, lineColor CodeLineColor,
 	isTransparent bool) (bytes []byte, err error) {
 
 	data := WxaCodeUnlimited{
@@ -133,16 +134,16 @@ func (q *QrCodeServiceImpl) CreateWxaCodeUnlimitedBytes(scene, path string, widt
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.post(QrCodeUnlimitedUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.QrCodeUnlimitedUrl, "", data, at.AccessToken)
 	return
 }
 
-func (q *QrCodeServiceImpl) CreateWxaCodeUnlimited(scene, path string) ([]byte, error) {
+func (q *WxMaQrCodeServiceImpl) CreateWxaCodeUnlimited(scene, path string) ([]byte, error) {
 
 	return q.CreateWxaCodeUnlimitedBytes(scene, path, 430, true, DefaultCodeLineColor(), false)
 }
 
-func (q QrCodeServiceImpl) BytesToFile(filename string, bytes []byte) error {
+func (q WxMaQrCodeServiceImpl) BytesToFile(filename string, bytes []byte) error {
 	// 覆盖式写入
 	return ioutil.WriteFile(filename, bytes, 0664)
 }
