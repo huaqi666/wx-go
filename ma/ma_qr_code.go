@@ -84,7 +84,7 @@ func (q *WxMaQrCodeServiceImpl) CreateQrcodeBytes(path string, width int) (bytes
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.Post(common.QrCodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrcodeUrl, "", data, at.AccessToken)
 	return
 }
 
@@ -108,7 +108,7 @@ func (q *WxMaQrCodeServiceImpl) CreateWxaCodeBytes(path string, width int, autoC
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.Post(common.QrWxaCodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrWxaCodeUrl, "", data, at.AccessToken)
 	return
 }
 
@@ -134,7 +134,7 @@ func (q *WxMaQrCodeServiceImpl) CreateWxaCodeUnlimitedBytes(scene, path string, 
 	if err != nil {
 		return
 	}
-	bytes, err = q.service.Post(common.QrCodeUnlimitedUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrCodeUnlimitedUrl, "", data, at.AccessToken)
 	return
 }
 

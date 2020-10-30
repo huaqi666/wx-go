@@ -38,7 +38,7 @@ type WxMpServiceImpl struct {
 	qrCodeService WxMpQrcodeService
 }
 
-func newService(appId, secret string) *WxMpServiceImpl {
+func newWxMpService(appId, secret string) *WxMpServiceImpl {
 	impl := WxMpServiceImpl{}
 	impl.SetWxMpConfig(newWxMpConfig(appId, secret))
 	impl.userService = newWxMpUserService(&impl)
@@ -75,6 +75,6 @@ func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
 	_, _ = s.ForceGetAccessToken(true)
 }
 
-func NewService(appId, secret string) WxMpService {
-	return newService(appId, secret)
+func NewWxMpService(appId, secret string) WxMpService {
+	return newWxMpService(appId, secret)
 }

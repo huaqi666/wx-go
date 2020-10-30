@@ -4,6 +4,10 @@ import "wx-go/common"
 
 type WxMaConfig interface {
 	common.WxConfig
+
+	GetToken() string
+	GetAesKey() string
+	GetMsgDataFormat() string
 }
 
 type WxMaConfigImpl struct {
@@ -37,4 +41,16 @@ func (c *WxMaConfigImpl) GetAccessToken() *common.AccessToken {
 
 func (c *WxMaConfigImpl) SetAccessToken(at *common.AccessToken) {
 	c.AccessToken = at
+}
+
+func (c *WxMaConfigImpl) GetToken() string {
+	return c.Token
+}
+
+func (c *WxMaConfigImpl) GetAesKey() string {
+	return c.AesKey
+}
+
+func (c *WxMaConfigImpl) GetMsgDataFormat() string {
+	return c.MsgDataFormat
 }
