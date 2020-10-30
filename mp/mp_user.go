@@ -113,7 +113,11 @@ func (r *WxMpUserServiceImpl) UserUpdateRemark(openid, remark string) error {
 		"openid": openid,
 		"remark": remark,
 	}
-	_, err := r.service.Post(common.MpUserUpdateRemarkUrl, "", data, r.service.GetAccessToken())
+	at, err := r.service.GetAccessToken()
+	if err != nil {
+		return err
+	}
+	_, err = r.service.Post(common.MpUserUpdateRemarkUrl, "", data, at.AccessToken)
 	return err
 }
 
@@ -128,8 +132,13 @@ func (r *WxMpUserServiceImpl) GetUserInfoBy(openid, lang string) (*WxMpUser, err
 		lang = "zh_CN"
 	}
 
+	at, err := r.service.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
 	var data WxMpUser
-	err := r.service.GetFor(&data, common.MpUserInfoUrl, r.service.GetAccessToken(), openid, lang)
+	err = r.service.GetFor(&data, common.MpUserInfoUrl, at.AccessToken, openid, lang)
 	return &data, err
 }
 
@@ -143,15 +152,25 @@ func (r *WxMpUserServiceImpl) GetUserInfoListBy(arr []*WxMpUserQueryParam) ([]*W
 	data := map[string][]*WxMpUserQueryParam{
 		"user_list": arr,
 	}
+
+	at, err := r.service.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
 	var res []*WxMpUser
-	err := r.service.PostFor(&res, common.MpUserInfoBatchGetUrl, "", data, r.service.GetAccessToken())
+	err = r.service.PostFor(&res, common.MpUserInfoBatchGetUrl, "", data, at.AccessToken)
 	return res, err
 }
 
 func (r *WxMpUserServiceImpl) GetUserList(nextOpenid string) (*WxMpUserList, error) {
 
+	at, err := r.service.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
 	var data WxMpUserList
-	err := r.service.GetFor(&data, common.MpUserGetUrl, r.service.GetAccessToken(), nextOpenid)
+	err = r.service.GetFor(&data, common.MpUserGetUrl, at.AccessToken, nextOpenid)
 	return &data, err
 }
 
@@ -161,7 +180,13 @@ func (r *WxMpUserServiceImpl) ChangeOpenid(fromAppId string, openidArr ...string
 		"from_appid":  fromAppId,
 		"openid_list": openidArr,
 	}
+
+	at, err := r.service.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
 	var res []*WxMpChangeOpenid
-	err := r.service.PostFor(&res, common.MpUserChangeOpenidUrl, "", data, r.service.GetAccessToken())
+	err = r.service.PostFor(&res, common.MpUserChangeOpenidUrl, "", data, at.AccessToken)
 	return res, err
 }
