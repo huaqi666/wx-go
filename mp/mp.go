@@ -41,15 +41,6 @@ type WxMpService interface {
 	GetWxMpQrcodeService() WxMpQrcodeService
 }
 
-// jspai signature.
-type WxJsapiSignature struct {
-	AppId     string `json:"app_id"`
-	NonceStr  string `json:"nonce_str"`
-	Timestamp string `json:"timestamp"`
-	Url       string `json:"url"`
-	Signature string `json:"signature"`
-}
-
 type WxMpServiceImpl struct {
 	common.WxServiceImpl
 

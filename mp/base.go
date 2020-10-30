@@ -29,3 +29,12 @@ type Ticket struct {
 	Time      time.Time `json:"time"`
 	Type      string    `json:"type"`
 }
+
+// jspai signature.
+type WxJsapiSignature struct {
+	AppId     string `json:"app_id"`
+	NonceStr  string `json:"nonce_str"`
+	Timestamp string `json:"timestamp"`
+	Url       string `json:"url"`
+	Signature string `json:"signature"`
+}
