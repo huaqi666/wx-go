@@ -48,6 +48,13 @@ func maTest(c Config) {
 func mpTest(c Config) {
 	service := mp.NewWxMpService(c.AppId, c.Secret)
 
+	da, err := service.CreateJsapiSignature("https://www.baidu.com")
+	if err == nil {
+		fmt.Println(da)
+	} else {
+		fmt.Println(err.Error())
+	}
+
 	qc := service.GetWxMpQrcodeService()
 
 	bytes, err := qc.QrcodeCreateTmpTicket(mp.QrScene, "/pages/index", 0, 30)
