@@ -31,6 +31,7 @@ type WxMaServiceImpl struct {
 
 func newWxMaService(appId, secret string) *WxMaServiceImpl {
 	impl := WxMaServiceImpl{}
+	impl.SetHttpService(common.NewService())
 	impl.SetWxMaConfig(newWxMaConfig(appId, secret))
 	impl.userService = newWxMaUserService(&impl)
 	impl.qrCodeService = newWxMaQrcodeService(&impl)
