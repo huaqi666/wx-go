@@ -1,5 +1,10 @@
 package mp
 
+import (
+	"time"
+	"wx-go/common"
+)
+
 type TicketType string
 type ActionName string
 
@@ -15,3 +20,12 @@ const (
 	QrLimitScene    = "QR_LIMIT_SCENE"
 	QrLimitStrScene = "QR_LIMIT_STR_SCENE"
 )
+
+// 授权页ticket
+type Ticket struct {
+	common.Err
+	Ticket    string    `json:"ticket"`
+	ExpiresIn uint64    `json:"expires_in"`
+	Time      time.Time `json:"time"`
+	Type      string    `json:"type"`
+}

@@ -1,7 +1,9 @@
 package ma
 
 import (
+	"fmt"
 	"wx-go/common"
+	"wx-go/common/util"
 )
 
 type WxMaService interface {
@@ -14,6 +16,9 @@ type WxMaService interface {
 
 	// jsCode换取openid
 	JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error)
+	// 验证消息的确来自微信服务器
+	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319&token=&lang=zh_CN
+	CheckSignature(timestamp, nonce, signature string) bool
 
 	// 获取用户接口
 	GetWxMaUserService() WxMaUserService
@@ -42,6 +47,16 @@ func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResu
 	var jsr JsCode2SessionResult
 	err := s.GetFor(&jsr, common.MaSessionInfoUrl, s.config.GetAppID(), s.config.GetSecret(), jsCode)
 	return &jsr, err
+}
+
+func (s *WxMaServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
+	arr := []string{s.GetWxMaConfig().GetToken(), timestamp, nonce}
+	gen, err := util.Gen(arr)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	return gen == signature
 }
 
 func (s *WxMaServiceImpl) GetWxMaUserService() WxMaUserService {

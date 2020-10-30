@@ -10,7 +10,7 @@ import (
 type WxMaUserService interface {
 	// jsCode换取openid
 	GetSessionInfo(jsCode string) (*JsCode2SessionResult, error)
-	// 用户用户信息
+	// 解密用户敏感数据
 	GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error)
 	// 解密用户手机号信息.
 	GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error)

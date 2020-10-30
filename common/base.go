@@ -10,6 +10,7 @@ type Err struct {
 
 //小程序access_token
 type AccessToken struct {
+	Err
 	AccessToken string    `json:"access_token"`
 	ExpiresIn   uint64    `json:"expires_in"`
 	Time        time.Time `json:"time"`
