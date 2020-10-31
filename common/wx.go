@@ -14,7 +14,7 @@ type WxConfig interface {
 	// 获取access_token
 	GetAccessToken() *AccessToken
 	// 设置access_token
-	SetAccessToken(at *AccessToken)
+	SetAccessToken(*AccessToken)
 }
 
 type WxAccessToken interface {

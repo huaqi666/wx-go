@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"math/rand"
 )
 
@@ -21,4 +23,10 @@ func IsAnyEmpty(values ...string) bool {
 		}
 	}
 	return false
+}
+
+func Md5(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }

@@ -3,62 +3,98 @@ package util
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
+	"crypto/sha1"
 	"encoding/base64"
-	"encoding/json"
+	"encoding/hex"
 	"errors"
+	"io"
+	"sort"
+	"strings"
 )
 
-var (
-	ErrAppIDNotMatch       = errors.New("app_id not match")
-	ErrInvalidBlockSize    = errors.New("invalid block size")
-	ErrInvalidPKCS7Data    = errors.New("invalid PKCS7 data")
-	ErrInvalidPKCS7Padding = errors.New("invalid padding on input")
-)
-
-func Decrypt(v interface{}, sessionKey, encryptedData, ivStr string) error {
-	aesKey, err := base64.StdEncoding.DecodeString(sessionKey)
-	if err != nil {
-		return err
-	}
-	cipherText, err := base64.StdEncoding.DecodeString(encryptedData)
-	if err != nil {
-		return err
-	}
-	ivBytes, err := base64.StdEncoding.DecodeString(ivStr)
-	if err != nil {
-		return err
-	}
-	block, err := aes.NewCipher(aesKey)
-	if err != nil {
-		return err
-	}
-	mode := cipher.NewCBCDecrypter(block, ivBytes)
-	mode.CryptBlocks(cipherText, cipherText)
-	cipherText, err = pkcs7Unpacked(cipherText, block.BlockSize())
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(cipherText, v)
+// 对加密数据包进行签名校验，确保数据的完整性。
+func validateSignature(signature string, parts ...string) bool {
+	return signature == createSignature(parts...)
 }
 
-// 解压
-// pkcs7Unpacked returns slice of the original data without padding
-func pkcs7Unpacked(data []byte, blockSize int) ([]byte, error) {
-	if blockSize <= 0 {
-		return nil, ErrInvalidBlockSize
+// 校验用户数据数据
+func validateUserInfo(signature, rawData, ssk string) bool {
+	return validateSignature(signature, rawData, ssk)
+}
+
+// 拼凑签名
+func createSignature(parts ...string) string {
+	sort.Strings(parts)
+	raw := sha1.Sum([]byte(strings.Join(parts, "")))
+
+	return hex.EncodeToString(raw[:])
+}
+
+// cbcEncrypt CBC 加密数据
+func cbcEncrypt(key, plaintext, iv []byte) ([]byte, error) {
+	if len(plaintext)%aes.BlockSize != 0 {
+		return nil, errors.New("plaintext is not a multiple of the block size")
 	}
-	if len(data)%blockSize != 0 || len(data) == 0 {
-		return nil, ErrInvalidPKCS7Data
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
 	}
-	c := data[len(data)-1]
-	n := int(c)
-	if n == 0 || n > len(data) {
-		return nil, ErrInvalidPKCS7Padding
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv = iv[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return nil, err
 	}
-	for i := 0; i < n; i++ {
-		if data[len(data)-n+i] != c {
-			return nil, ErrInvalidPKCS7Padding
-		}
+
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
+
+	return ciphertext, nil
+}
+
+// CBC解密数据
+func cbcDecrypt(key, ciphertext, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
 	}
-	return data[:len(data)-n], nil
+
+	size := aes.BlockSize
+	iv = iv[:size]
+	// ciphertext = ciphertext[size:] TODO: really useless?
+
+	if len(ciphertext) < size {
+		return nil, errors.New("ciphertext too short")
+	}
+
+	if len(ciphertext)%size != 0 {
+		return nil, errors.New("ciphertext is not a multiple of the block size")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(ciphertext, ciphertext)
+
+	return pkcs7decode(ciphertext), nil
+}
+
+// decryptData 解密用户数据
+func decryptData(ssk, ciphertext, iv string) ([]byte, error) {
+	key, err := base64.StdEncoding.DecodeString(ssk)
+	if err != nil {
+		return nil, err
+	}
+
+	cipherText, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+
+	rawIV, err := base64.StdEncoding.DecodeString(iv)
+	if err != nil {
+		return nil, err
+	}
+
+	return cbcDecrypt(key, cipherText, rawIV)
 }

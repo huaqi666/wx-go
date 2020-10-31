@@ -1,7 +1,9 @@
 package util
 
 import (
+	"crypto/hmac"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"sort"
@@ -35,4 +37,10 @@ func Gen(arr []string) (string, error) {
 	}
 	sum := sha1.Sum([]byte(str))
 	return strings.ToLower(hex.EncodeToString(sum[:])), nil
+}
+
+func HmacSha256(str, key string) string {
+	h := hmac.New(sha256.New, []byte(key))
+	h.Write([]byte(str))
+	return strings.ToLower(hex.EncodeToString(h.Sum(nil)))
 }

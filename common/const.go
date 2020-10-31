@@ -34,3 +34,7 @@ const (
 	MpUserInfoBatchGetUrl = ApiDefaultHostUrl + "/cgi-bin/user/info/batchget" + ApiSuffix
 	MpUserChangeOpenidUrl = ApiDefaultHostUrl + "/cgi-bin/changeopenid"
 )
+
+const (
+	PayDefaultPayBaseUrl = "https://api.mch.weixin.qq.com"
+)

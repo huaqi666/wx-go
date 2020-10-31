@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,13 +22,14 @@ type Service interface {
 	PostFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error
 }
 
-// http请求默认实现
+// http请求默认实现(json传参)
 type ServiceImpl struct {
+	client *http.Client
 }
 
 func (s *ServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
-	res, err := http.Get(uri)
+	res, err := s.client.Get(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +39,7 @@ func (s *ServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 func (s *ServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
 	body, err := json.Marshal(data)
-	res, err := http.Post(uri, contentType, bytes.NewReader(body))
+	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +62,62 @@ func (s *ServiceImpl) PostFor(v interface{}, url string, contentType string, dat
 	return json.Unmarshal(res, v)
 }
 
+// http请求默认实现(xml传参)
+type XmlServiceImpl struct {
+	client *http.Client
+}
+
+func (s *XmlServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
+	uri := fmt.Sprintf(url, args...)
+	res, err := s.client.Get(uri)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(res.Body)
+}
+
+func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
+	uri := fmt.Sprintf(url, args...)
+	body, err := xml.Marshal(data)
+	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(res.Body)
+}
+
+func (s *XmlServiceImpl) GetFor(v interface{}, url string, args ...interface{}) error {
+	res, err := s.Get(url, args...)
+	if err != nil {
+		return err
+	}
+	return xml.Unmarshal(res, v)
+}
+
+func (s *XmlServiceImpl) PostFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error {
+	res, err := s.Post(url, contentType, data, args...)
+	if err != nil {
+		return err
+	}
+	return xml.Unmarshal(res, v)
+}
+
 func NewService() Service {
-	return &ServiceImpl{}
+	return NewServiceFor(http.DefaultClient)
+}
+
+func NewServiceFor(client *http.Client) Service {
+	return &ServiceImpl{
+		client: client,
+	}
+}
+
+func NewXmlService() Service {
+	return NewXmlServiceFor(http.DefaultClient)
+}
+
+func NewXmlServiceFor(client *http.Client) Service {
+	return &XmlServiceImpl{
+		client: client,
+	}
 }
