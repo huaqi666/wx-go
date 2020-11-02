@@ -1,6 +1,6 @@
 package mp
 
-import "wx-go/common"
+import "github.com/cliod/wx-go/common"
 
 type WxMpUserService interface {
 	// 设置用户备注名

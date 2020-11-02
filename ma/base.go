@@ -1,7 +1,7 @@
 package ma
 
 import (
-	"wx-go/common"
+	"github.com/cliod/wx-go/common"
 )
 
 // js_code session_info

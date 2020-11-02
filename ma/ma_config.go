@@ -1,6 +1,6 @@
 package ma
 
-import "wx-go/common"
+import "github.com/cliod/wx-go/common"
 
 type WxMaConfig interface {
 	common.WxConfig

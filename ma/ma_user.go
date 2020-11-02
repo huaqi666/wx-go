@@ -3,8 +3,8 @@ package ma
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"github.com/cliod/wx-go/common/util"
 	"strings"
-	"wx-go/common/util"
 )
 
 type WxMaUserService interface {

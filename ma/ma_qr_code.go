@@ -1,8 +1,8 @@
 package ma
 
 import (
+	"github.com/cliod/wx-go/common"
 	"io/ioutil"
-	"wx-go/common"
 )
 
 type WxMaQrcodeService interface {

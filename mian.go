@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cliod/wx-go/ma"
+	"github.com/cliod/wx-go/mp"
 	"io/ioutil"
 	"os"
-	"wx-go/ma"
-	"wx-go/mp"
 )
 
 func main() {
