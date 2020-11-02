@@ -1,7 +1,7 @@
 package pay
 
 import (
-	"wx-go/common"
+	"github.com/cliod/wx-go/common"
 )
 
 type WxPayConfig struct {

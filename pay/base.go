@@ -2,7 +2,7 @@ package pay
 
 import (
 	"encoding/xml"
-	"wx-go/common"
+	"github.com/cliod/wx-go/common"
 )
 
 type (
