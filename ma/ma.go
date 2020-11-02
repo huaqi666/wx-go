@@ -2,8 +2,8 @@ package ma
 
 import (
 	"fmt"
-	"wx-go/common"
-	"wx-go/common/util"
+	"github.com/cliod/wx-go/common"
+	"github.com/cliod/wx-go/common/util"
 )
 
 type WxMaService interface {

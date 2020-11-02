@@ -1,8 +1,8 @@
 package mp
 
 import (
+	"github.com/cliod/wx-go/common"
 	"time"
-	"wx-go/common"
 )
 
 type TicketType string

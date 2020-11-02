@@ -1,9 +1,9 @@
 package mp
 
 import (
+	"github.com/cliod/wx-go/common"
 	"strconv"
 	"time"
-	"wx-go/common"
 )
 
 type WxMpConfig interface {

@@ -2,10 +2,10 @@ package mp
 
 import (
 	"fmt"
+	"github.com/cliod/wx-go/common"
+	"github.com/cliod/wx-go/common/util"
 	"strconv"
 	"time"
-	"wx-go/common"
-	"wx-go/common/util"
 )
 
 type WxMpService interface {

@@ -1,6 +1,6 @@
 package mp
 
-import "wx-go/common"
+import "github.com/cliod/wx-go/common"
 
 type WxMpQrcodeService interface {
 	// 换取临时二维码ticket
