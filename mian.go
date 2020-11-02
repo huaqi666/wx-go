@@ -5,17 +5,21 @@ import (
 	"fmt"
 	"github.com/cliod/wx-go/ma"
 	"github.com/cliod/wx-go/mp"
+	"github.com/cliod/wx-go/pay"
 	"io/ioutil"
+	"math/rand"
 	"os"
+	"strconv"
+	"time"
 )
 
 func main() {
 
 	c := GetConfig()
 
-	maTest(c.Ma)
-
-	mpTest(c.Mp)
+	//maTest(c.Ma)
+	//
+	//mpTest(c.Mp)
 
 	payTest(c.Pay)
 }
@@ -39,7 +43,12 @@ func maTest(c Config) {
 
 	res, err := uc.GetSessionInfo("<js_code>")
 	if err == nil {
-		fmt.Println(res)
+		r, err := json.Marshal(res)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -50,7 +59,12 @@ func mpTest(c Config) {
 
 	da, err := service.CreateJsapiSignature("https://www.baidu.com")
 	if err == nil {
-		fmt.Println(da)
+		r, err := json.Marshal(da)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -59,7 +73,12 @@ func mpTest(c Config) {
 
 	bytes, err := qc.QrcodeCreateTmpTicket(mp.QrScene, "/pages/index", 0, 30)
 	if err == nil {
-		fmt.Println(bytes)
+		r, err := json.Marshal(bytes)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -68,14 +87,33 @@ func mpTest(c Config) {
 
 	res, err := uc.GetUserInfo("<open_id>")
 	if err == nil {
-		fmt.Println(res)
+		r, err := json.Marshal(res)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
 }
 
 func payTest(c Config) {
+	service := pay.NewWxPayService(c.AppId, "1599573231", "eXSuSSXMucMmbgcQUiCQ1I7mxp092ss1", "https://shop.mkmke.cn/api/v1/notify", "")
 
+	s := strconv.Itoa(time.Now().Nanosecond()) + strconv.Itoa(rand.Intn(999999))
+
+	res, err := service.UnifyPay(&pay.WxPayUnifiedOrderRequest{
+		TotalFee:   1,
+		Openid:     "o_gW65X-OCbBwsiGOP1JVb3sUIoo",
+		OutTradeNo: s,
+		Body:       "测试数据",
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println(string(res))
+	}
 }
 
 type Config struct {

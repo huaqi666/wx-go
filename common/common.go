@@ -79,6 +79,11 @@ func (s *XmlServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
 	body, err := xml.Marshal(data)
+	fmt.Println(string(body))
+	b, err := json.Marshal(data)
+	if err == nil {
+		fmt.Println(string(b))
+	}
 	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {
 		return nil, err

@@ -63,7 +63,7 @@ func cbcDecrypt(key, ciphertext, iv []byte) ([]byte, error) {
 
 	size := aes.BlockSize
 	iv = iv[:size]
-	// ciphertext = ciphertext[size:] TODO: really useless?
+	// ciphertext = ciphertext[size:]
 
 	if len(ciphertext) < size {
 		return nil, errors.New("ciphertext too short")
