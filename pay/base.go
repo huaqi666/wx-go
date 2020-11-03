@@ -25,20 +25,21 @@ const (
 
 type BaseWxPayResult struct {
 	common.Err
-	RetMsg string `json:"retmsg" xml:"retmsg"`
+	ResultCode string `json:"result_code" xml:"result_code"`
+	RetMsg     string `json:"retmsg" xml:"retmsg"`
 
 	ReturnCode string `json:"return_code" xml:"return_code"`
 	ReturnMsg  string `json:"return_msg" xml:"return_msg"`
 
-	ResultCode string `json:"result_code" xml:"result_code"`
 	ErrCode    string `json:"err_code" xml:"err_code"`
 	ErrCodeDes string `json:"err_code_des" xml:"err_code_des"`
-	AppId      string `json:"appid" xml:"appid"`
-	MchId      string `json:"mch_id" xml:"mch_id"`
-	SubAppId   string `json:"sub_app_id" xml:"sub_app_id"`
-	SubMchId   string `json:"sub_mch_id" xml:"sub_mch_id"`
-	NonceStr   string `json:"nonce_str" xml:"nonce_str"`
-	Sign       string `json:"sign" xml:"sign"`
+
+	AppId    string `json:"appid" xml:"appid"`
+	MchId    string `json:"mch_id" xml:"mch_id"`
+	SubAppId string `json:"sub_app_id" xml:"sub_app_id"`
+	SubMchId string `json:"sub_mch_id" xml:"sub_mch_id"`
+	NonceStr string `json:"nonce_str" xml:"nonce_str"`
+	Sign     string `json:"sign" xml:"sign"`
 }
 
 type BaseWxPayRequest struct {

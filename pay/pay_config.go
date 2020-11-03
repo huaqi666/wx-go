@@ -55,5 +55,7 @@ func NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConf
 		KeyPath:   keyPath,
 		TradeType: JSAPI,
 		SignType:  MD5,
+
+		PayBaseUrl: common.PayDefaultPayBaseUrl,
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/cliod/wx-go/common/util"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -81,11 +82,7 @@ func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, 
 	uri := fmt.Sprintf(url, args...)
 	var body []byte
 	if reflect.ValueOf(data).Kind() == reflect.Map {
-		s := "<xml>"
-		for k, v := range data.(map[string]interface{}) {
-			s += "<" + k + ">" + v.(string) + "</" + k + ">"
-		}
-		s += "</xml>"
+		s := util.BuildByMap(data.(map[string]interface{}))
 		body = []byte(s)
 	} else {
 		b, err := xml.Marshal(data)

@@ -37,4 +37,8 @@ const (
 
 const (
 	PayDefaultPayBaseUrl = "https://api.mch.weixin.qq.com"
+	PayUnifiedOrder      = "/pay/unifiedorder"
+	PayCloseOrder        = "/pay/closeorder"
+	PayQueryOrder        = "/pay/orderquery"
+	PayGetSandboxSignKey = "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey"
 )

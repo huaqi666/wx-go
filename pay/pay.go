@@ -217,9 +217,9 @@ func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxP
 	if request.NotifyUrl == "" && c.NotifyUrl == "" {
 		return nil, fmt.Errorf("参数为空")
 	}
-	p.convert(request)
 
-	request.NonceStr = util.RandSeq(32)
+	p.cover(request)
+
 	if c.UseSandboxEnv {
 		re, err := p.GetSandboxSignKey(&request.BaseWxPayRequest)
 		if err != nil {
@@ -230,7 +230,7 @@ func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxP
 		request.Sign = p.signForObj(request, c.SignType, c.MchKey)
 	}
 
-	url := p.GetPayBaseUr() + "/pay/unifiedorder"
+	url := p.GetPayBaseUr() + common.PayUnifiedOrder
 
 	var res WxPayUnifiedOrderResult
 	err := p.PostFor(&res, url, "", request)
@@ -252,8 +252,9 @@ func (p *WxPayV2ServiceImpl) CloseOrder(request *WxPayOrderCloseRequest) (*WxPay
 		return nil, fmt.Errorf("outTradeNo不能为空")
 	}
 
-	url := p.GetPayBaseUr() + "/pay/closeorder"
+	url := p.GetPayBaseUr() + common.PayCloseOrder
 
+	p.checkConfig(&request.BaseWxPayRequest)
 	request.Sign = p.signForObj(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
 
 	var res WxPayOrderCloseResult
@@ -273,10 +274,10 @@ func (p *WxPayV2ServiceImpl) QueryOrderBy(outTradeNo, transactionId string) (*Wx
 
 func (p *WxPayV2ServiceImpl) QueryOrder(request *WxPayOrderQueryRequest) (*WxPayOrderQueryResult, error) {
 
-	url := p.GetPayBaseUr() + "/pay/orderquery"
+	url := p.GetPayBaseUr() + common.PayQueryOrder
 
+	p.checkConfig(&request.BaseWxPayRequest)
 	request.Sign = p.signForObj(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
-	request.Version = "1.0"
 
 	var res WxPayOrderQueryResult
 	err := p.PostFor(&res, url, "", request)
@@ -296,7 +297,7 @@ func (p *WxPayV2ServiceImpl) GetEntPayService() WxEntPayService {
 }
 
 func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *BaseWxPayRequest) (*WxPaySandboxSignKeyResult, error) {
-	url := "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey"
+	url := common.PayGetSandboxSignKey
 
 	var res WxPaySandboxSignKeyResult
 	//request.Sign = p.signForObj(request, request.SignType, p.GetWxPayConfig().MchKey)
@@ -337,13 +338,28 @@ func (p *WxPayV2ServiceImpl) signForObj(params interface{}, st SignType, sk stri
 	return strings.ToUpper(sign)
 }
 
-func (p *WxPayV2ServiceImpl) convert(request *WxPayUnifiedOrderRequest) {
+func (p *WxPayV2ServiceImpl) cover(request *WxPayUnifiedOrderRequest) {
 
 	c := p.GetWxPayConfig()
 
+	p.checkConfig(&request.BaseWxPayRequest)
+
 	if request.NotifyUrl == "" {
-		request.NotifyUrl = p.GetWxPayConfig().NotifyUrl
+		request.NotifyUrl = c.NotifyUrl
 	}
+	if request.SpbillCreateIp == "" {
+		request.SpbillCreateIp = "127.0.0.1"
+	}
+	if request.TradeType == "" {
+		request.TradeType = JSAPI
+	}
+
+}
+
+func (p *WxPayV2ServiceImpl) checkConfig(request *BaseWxPayRequest) {
+
+	c := p.GetWxPayConfig()
+
 	if request.AppId == "" {
 		request.AppId = c.AppId
 	}
@@ -359,12 +375,7 @@ func (p *WxPayV2ServiceImpl) convert(request *WxPayUnifiedOrderRequest) {
 	if request.SubMchId == "" {
 		request.SubMchId = c.SubMchId
 	}
-	if request.SpbillCreateIp == "" {
-		request.SpbillCreateIp = "127.0.0.1"
-	}
-	if request.TradeType == "" {
-		request.TradeType = JSAPI
-	}
+	request.NonceStr = util.RandSeq(32)
 }
 
 func NewWxPayService(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {
