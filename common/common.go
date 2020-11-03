@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/cliod/wx-go/common/util"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 )
 
 // http请求
@@ -78,11 +80,16 @@ func (s *XmlServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 
 func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
-	body, err := xml.Marshal(data)
-	fmt.Println(string(body))
-	b, err := json.Marshal(data)
-	if err == nil {
-		fmt.Println(string(b))
+	var body []byte
+	if reflect.ValueOf(data).Kind() == reflect.Map {
+		s := util.BuildByMap(data.(map[string]interface{}))
+		body = []byte(s)
+	} else {
+		b, err := xml.Marshal(data)
+		if err != nil {
+			return nil, err
+		}
+		body = b
 	}
 	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {

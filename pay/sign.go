@@ -11,7 +11,7 @@ var Ignores = []string{"sign", "key", "xmlString", "xmlDoc", "couponList"}
 
 func buildSign(params map[string]interface{}, sk string, ignoreParams ...string) string {
 	var arr []string
-	for k, _ := range params {
+	for k := range params {
 		arr = append(arr, k)
 	}
 	sort.Strings(arr)
@@ -26,8 +26,8 @@ func buildSign(params map[string]interface{}, sk string, ignoreParams ...string)
 		switch value.(type) {
 		case string:
 			vv = value.(string)
-		case int:
-			vv = strconv.Itoa(value.(int))
+		case float64:
+			vv = strconv.FormatFloat(value.(float64), 'f', -1, 64)
 		case int64:
 			vv = strconv.FormatInt(value.(int64), 10)
 		case SignType:

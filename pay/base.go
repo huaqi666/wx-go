@@ -19,29 +19,33 @@ const (
 )
 
 const (
-	HmacSha256 SignType = "HMAC_SHA256"
+	HmacSha256 SignType = "HMAC-SHA256"
 	MD5        SignType = "MD5"
 )
 
 type BaseWxPayResult struct {
 	common.Err
+	ResultCode string `json:"result_code" xml:"result_code"`
+	RetMsg     string `json:"retmsg" xml:"retmsg"`
+
 	ReturnCode string `json:"return_code" xml:"return_code"`
 	ReturnMsg  string `json:"return_msg" xml:"return_msg"`
 
-	ResultCode string `json:"result_code" xml:"result_code"`
-	ErrCode    string `json:"errcode" xml:"err_code"`
+	ErrCode    string `json:"err_code" xml:"err_code"`
 	ErrCodeDes string `json:"err_code_des" xml:"err_code_des"`
-	AppId      string `json:"appid" xml:"appid"`
-	MchId      string `json:"mch_id" xml:"mch_id"`
-	SubAppId   string `json:"sub_app_id" xml:"sub_app_id"`
-	SubMchId   string `json:"sub_mch_id" xml:"sub_mch_id"`
-	NonceStr   string `json:"nonce_str" xml:"nonce_str"`
-	Sign       string `json:"sign" xml:"sign"`
+
+	AppId    string `json:"appid" xml:"appid"`
+	MchId    string `json:"mch_id" xml:"mch_id"`
+	SubAppId string `json:"sub_app_id" xml:"sub_app_id"`
+	SubMchId string `json:"sub_mch_id" xml:"sub_mch_id"`
+	NonceStr string `json:"nonce_str" xml:"nonce_str"`
+	Sign     string `json:"sign" xml:"sign"`
 }
 
 type BaseWxPayRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	// 公众号或者小程序appId
-	AppId string `json:"appid" xml:"app_id"`
+	AppId string `json:"appid" xml:"appid"`
 	// 商户号.
 	MchId string `json:"mch_id" xml:"mch_id"`
 	// 服务商模式下的子商户公众账号ID.
@@ -51,7 +55,7 @@ type BaseWxPayRequest struct {
 	// 随机字符串.不长于32位。推荐随机数生成算法
 	NonceStr string `json:"nonce_str" xml:"nonce_str"`
 	// 签名.
-	Sign string `json:"sign" xml:"sign"`
+	Sign string `json:"sign,omitempty" xml:"sign,omitempty"`
 	// 签名类型.
 	SignType SignType `json:"sign_type" xml:"sign_type,omitempty"`
 	// 企业微信签名
@@ -202,4 +206,9 @@ type EntPayRequest struct {
 }
 
 type EntPayResult struct {
+}
+
+type WxPaySandboxSignKeyResult struct {
+	BaseWxPayResult
+	SandboxSignkey string `json:"sandbox_signkey" xml:"sandbox_signkey"`
 }
