@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 )
 
 // http请求
@@ -78,7 +79,21 @@ func (s *XmlServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 
 func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
-	body, err := xml.Marshal(data)
+	var body []byte
+	if reflect.ValueOf(data).Kind() == reflect.Map {
+		s := "<xml>"
+		for k, v := range data.(map[string]interface{}) {
+			s += "<" + k + ">" + v.(string) + "</" + k + ">"
+		}
+		s += "</xml>"
+		body = []byte(s)
+	} else {
+		b, err := xml.Marshal(data)
+		if err != nil {
+			return nil, err
+		}
+		body = b
+	}
 	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {
 		return nil, err

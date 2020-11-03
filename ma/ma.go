@@ -34,13 +34,17 @@ type WxMaServiceImpl struct {
 	qrCodeService WxMaQrcodeService
 }
 
-func newWxMaService(appId, secret string) *WxMaServiceImpl {
+func newWxMaServiceFor(config WxMaConfig) *WxMaServiceImpl {
 	impl := WxMaServiceImpl{}
 	impl.SetHttpService(common.NewService())
-	impl.SetWxMaConfig(newWxMaConfig(appId, secret))
+	impl.SetWxMaConfig(config)
 	impl.userService = newWxMaUserService(&impl)
 	impl.qrCodeService = newWxMaQrcodeService(&impl)
 	return &impl
+}
+
+func newWxMaService(appId, secret string) *WxMaServiceImpl {
+	return newWxMaServiceFor(newWxMaConfig(appId, secret))
 }
 
 func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error) {
@@ -79,4 +83,8 @@ func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
 
 func NewWxMaService(appId, secret string) WxMaService {
 	return newWxMaService(appId, secret)
+}
+
+func NewWxMaServiceFor(config WxMaConfig) WxMaService {
+	return newWxMaServiceFor(config)
 }

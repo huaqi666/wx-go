@@ -49,13 +49,17 @@ type WxMpServiceImpl struct {
 	qrCodeService WxMpQrcodeService
 }
 
-func newWxMpService(appId, secret string) *WxMpServiceImpl {
+func newWxMpServiceFor(config WxMpConfig) *WxMpServiceImpl {
 	impl := WxMpServiceImpl{}
 	impl.SetHttpService(common.NewService())
-	impl.SetWxMpConfig(newWxMpConfig(appId, secret))
+	impl.SetWxMpConfig(config)
 	impl.userService = newWxMpUserService(&impl)
 	impl.qrCodeService = newWxMpQrcodeService(&impl)
 	return &impl
+}
+
+func newWxMpService(appId, secret string) *WxMpServiceImpl {
+	return newWxMpServiceFor(newWxMpConfig(appId, secret))
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
@@ -140,4 +144,8 @@ func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
 
 func NewWxMpService(appId, secret string) WxMpService {
 	return newWxMpService(appId, secret)
+}
+
+func NewWxMpServiceFor(config WxMpConfig) WxMpService {
+	return newWxMpServiceFor(config)
 }

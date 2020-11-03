@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"github.com/cliod/wx-go/ma"
 	"github.com/cliod/wx-go/mp"
+	"github.com/cliod/wx-go/pay"
 	"io/ioutil"
+	"math/rand"
 	"os"
+	"strconv"
+	"time"
 )
 
 func main() {
@@ -39,7 +43,12 @@ func maTest(c Config) {
 
 	res, err := uc.GetSessionInfo("<js_code>")
 	if err == nil {
-		fmt.Println(res)
+		r, err := json.Marshal(res)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -50,7 +59,12 @@ func mpTest(c Config) {
 
 	da, err := service.CreateJsapiSignature("https://www.baidu.com")
 	if err == nil {
-		fmt.Println(da)
+		r, err := json.Marshal(da)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -59,7 +73,12 @@ func mpTest(c Config) {
 
 	bytes, err := qc.QrcodeCreateTmpTicket(mp.QrScene, "/pages/index", 0, 30)
 	if err == nil {
-		fmt.Println(bytes)
+		r, err := json.Marshal(bytes)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -68,7 +87,12 @@ func mpTest(c Config) {
 
 	res, err := uc.GetUserInfo("<open_id>")
 	if err == nil {
-		fmt.Println(res)
+		r, err := json.Marshal(res)
+		if err != nil {
+			fmt.Println(err.Error())
+		} else {
+			fmt.Println(string(r))
+		}
 	} else {
 		fmt.Println(err.Error())
 	}
@@ -76,11 +100,30 @@ func mpTest(c Config) {
 
 func payTest(c Config) {
 
+	conf := pay.NewBaseV2Config(c.AppId, c.MchId, c.MchKey, "https://www.baidu.com/notify", "")
+	conf.UseSandboxEnv = true
+	service := pay.NewWxPayServiceFor(conf)
+
+	s := strconv.Itoa(time.Now().Nanosecond()) + strconv.Itoa(rand.Intn(999999))
+
+	res, err := service.UnifyPay(&pay.WxPayUnifiedOrderRequest{
+		TotalFee:   100,
+		Openid:     "<open_id>",
+		OutTradeNo: s,
+		Body:       "测试数据",
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println(string(res))
+	}
 }
 
 type Config struct {
 	AppId  string `json:"app_id"`
 	Secret string `json:"secret"`
+	MchId  string `json:"mch_id"`
+	MchKey string `json:"mch_key"`
 }
 
 type WxConfig struct {
