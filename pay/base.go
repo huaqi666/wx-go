@@ -19,7 +19,7 @@ const (
 )
 
 const (
-	HmacSha256 SignType = "HMAC_SHA256"
+	HmacSha256 SignType = "HMAC-SHA256"
 	MD5        SignType = "MD5"
 )
 
