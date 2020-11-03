@@ -35,10 +35,25 @@ const (
 	MpUserChangeOpenidUrl = ApiDefaultHostUrl + "/cgi-bin/changeopenid"
 )
 
+// pay
 const (
 	PayDefaultPayBaseUrl = "https://api.mch.weixin.qq.com"
 	PayUnifiedOrder      = "/pay/unifiedorder"
 	PayCloseOrder        = "/pay/closeorder"
 	PayQueryOrder        = "/pay/orderquery"
+
 	PayGetSandboxSignKey = "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey"
+
+	PayRefundUrl          = "/secapi/pay/refund"
+	PayRefundUrlV2        = "/secapi/pay/refundv2"
+	PayRefundSandboxUrl   = "/pay/refund"
+	PayRefundSandboxUrlV2 = "/pay/refundv2"
+	PayQueryRefundUrl     = "/pay/refundquery"
+	PayQueryRefundUrlV2   = "/pay/refundqueryv2"
+)
+
+// http header
+const (
+	PostXml  = "application/xml; charset=utf-8"
+	PostJson = "application/json; charset=utf-8"
 )

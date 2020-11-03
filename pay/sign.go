@@ -2,6 +2,7 @@ package pay
 
 import (
 	"encoding/json"
+	"github.com/cliod/wx-go/common/util"
 	"sort"
 	"strconv"
 	"strings"
@@ -54,4 +55,32 @@ func buildSignFor(request interface{}, sk string, ignoreParams ...string) string
 		return ""
 	}
 	return buildSign(data, sk, ignoreParams...)
+}
+
+func SignForMap(params map[string]interface{}, st SignType, sk string, ignoreParams ...string) string {
+	signStr := buildSign(params, sk, ignoreParams...)
+	var sign string
+	switch st {
+	case HmacSha256:
+		sign = util.HmacSha256(signStr, sk)
+	case MD5:
+		sign = util.Md5(signStr)
+	}
+	return sign
+}
+
+func SignForObj(params interface{}, st SignType, sk string, ignoreParams ...string) string {
+	p, ok := params.(map[string]interface{})
+	if ok {
+		return SignForMap(p, st, sk, ignoreParams...)
+	}
+	signStr := buildSignFor(params, sk, ignoreParams...)
+	var sign string
+	switch st {
+	case HmacSha256:
+		sign = util.HmacSha256(signStr, sk)
+	case MD5:
+		sign = util.Md5(signStr)
+	}
+	return sign
 }
