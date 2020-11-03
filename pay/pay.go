@@ -299,8 +299,14 @@ func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *BaseWxPayRequest) (*WxPa
 	url := "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey"
 
 	var res WxPaySandboxSignKeyResult
-	request.Sign = p.signForObj(request, request.SignType, p.GetWxPayConfig().MchKey)
-	err := p.PostFor(&res, url, "", request)
+	//request.Sign = p.signForObj(request, request.SignType, p.GetWxPayConfig().MchKey)
+	//err := p.PostFor(&res, url, "", request)
+	data := map[string]interface{}{
+		"mch_id":    request.MchId,
+		"nonce_str": request.NonceStr,
+	}
+	data["sign"] = p.signForMap(data, request.SignType, p.GetWxPayConfig().MchKey)
+	err := p.PostFor(&res, url, "", data)
 
 	return &res, err
 }

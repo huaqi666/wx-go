@@ -31,7 +31,7 @@ type BaseWxPayResult struct {
 	ReturnMsg  string `json:"return_msg" xml:"return_msg"`
 
 	ResultCode string `json:"result_code" xml:"result_code"`
-	ErrCode    string `json:"errcode" xml:"err_code"`
+	ErrCode    string `json:"err_code" xml:"err_code"`
 	ErrCodeDes string `json:"err_code_des" xml:"err_code_des"`
 	AppId      string `json:"appid" xml:"appid"`
 	MchId      string `json:"mch_id" xml:"mch_id"`
@@ -44,7 +44,7 @@ type BaseWxPayResult struct {
 type BaseWxPayRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
 	// 公众号或者小程序appId
-	AppId string `json:"appid" xml:"app_id"`
+	AppId string `json:"appid" xml:"appid"`
 	// 商户号.
 	MchId string `json:"mch_id" xml:"mch_id"`
 	// 服务商模式下的子商户公众账号ID.
