@@ -1,12 +1,5 @@
 package ma
 
-import (
-	"crypto/sha1"
-	"encoding/hex"
-	"github.com/cliod/wx-go/common/util"
-	"strings"
-)
-
 type WxMaUserService interface {
 	// jsCode换取openid
 	GetSessionInfo(jsCode string) (*JsCode2SessionResult, error)
@@ -15,7 +8,7 @@ type WxMaUserService interface {
 	// 解密用户手机号信息.
 	GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error)
 	// 验证用户信息完整性
-	checkUserInfo(sessionKey, rawData, signature string) bool
+	CheckUserInfo(sessionKey, rawData, signature string) bool
 }
 
 type UserInfo struct {
@@ -58,18 +51,13 @@ func (u *WxMaUserServiceImpl) GetSessionInfo(jsCode string) (*JsCode2SessionResu
 }
 
 func (u *WxMaUserServiceImpl) GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error) {
-	var usrInfo UserInfo
-	err := util.Decrypt(&usrInfo, sessionKey, encryptedData, ivStr)
-	return &usrInfo, err
+	return GetUserInfo(sessionKey, encryptedData, ivStr)
 }
 
 func (u *WxMaUserServiceImpl) GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
-	var info PhoneNumberInfo
-	err := util.Decrypt(&info, sessionKey, encryptedData, ivStr)
-	return &info, err
+	return GetPhoneNoInfo(sessionKey, encryptedData, ivStr)
 }
 
-func (u *WxMaUserServiceImpl) checkUserInfo(sessionKey, rawData, signature string) bool {
-	sum := sha1.Sum([]byte(rawData + sessionKey))
-	return strings.ToLower(hex.EncodeToString(sum[:])) == signature
+func (u *WxMaUserServiceImpl) CheckUserInfo(sessionKey, rawData, signature string) bool {
+	return CheckUserInfo(sessionKey, rawData, signature)
 }

@@ -1,7 +1,6 @@
 package mp
 
 import (
-	"fmt"
 	"github.com/cliod/wx-go/common"
 	"github.com/cliod/wx-go/common/util"
 	"strconv"
@@ -63,13 +62,7 @@ func newWxMpService(appId, secret string) *WxMpServiceImpl {
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
-	arr := []string{s.GetWxMpConfig().GetToken(), timestamp, nonce}
-	gen, err := util.Gen(arr)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-	return gen == signature
+	return CheckSignature(s.GetWxMpConfig().GetToken(), timestamp, nonce, signature)
 }
 
 func (s *WxMpServiceImpl) GetJsapiTicket() (*Ticket, error) {
