@@ -72,6 +72,31 @@ type WxPayService interface {
 	   ◆ 调用关单或撤销接口API之前，需确认支付状态； */
 	QueryOrder(*WxPayOrderQueryRequest) (*WxPayOrderQueryResult, error)
 
+	/* 微信支付-申请退款.
+	   详见 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
+	   1、交易时间超过一年的订单无法提交退款
+	   2、微信支付退款支持单笔交易分多次退款，多次退款需要提交原支付订单的商户订单号和设置不同的退款单号。申请退款总金额不能超过订单金额。 一笔退款失败后重新提交，请不要更换退款单号，请使用原商户退款单号
+	   3、请求频率限制：150qps，即每秒钟正常的申请退款请求次数不超过150次
+	       错误或无效请求频率限制：6qps，即每秒钟异常或错误的退款申请请求不超过6次
+	   4、每个支付订单的部分退款次数不能超过50次
+	   5、如果同一个用户有多笔退款，建议分不同批次进行退款，避免并发退款导致退款失败 */
+	Refund(*WxPayRefundRequest) (*WxPayRefundResult, error)
+	RefundV2(*WxPayRefundRequest) (*WxPayRefundResult, error)
+	/* 微信支付-查询退款（适合于需要自定义子商户号和子商户appid的情形）.
+	   应用场景：
+	     提交退款申请后，通过调用该接口查询退款状态。退款有一定延时，用零钱支付的退款20分钟内到账，
+	     银行卡支付的退款3个工作日后重新查询退款状态。
+	   详见 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_5 */
+	RefundQuery(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
+	/* 微信支付-查询退款API（支持单品）.
+	   应用场景：提交退款申请后，通过调用该接口查询退款状态。退款有一定延时，用零钱支付的退款20分钟内到账，银行卡支付的退款3个工作日后重新查询退款状态。
+	   注意：
+	   1、本接口支持查询单品优惠相关退款信息，且仅支持按微信退款单号或商户退款单号查询，若继续调用老查询退款接口，
+	      请见https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_5
+	   2、请求频率限制：300qps，即每秒钟正常的退款查询请求次数不超过300次
+	   3、错误或无效请求频率限制：6qps，即每秒钟异常或错误的退款查询请求不超过6次 */
+	RefundQueryV2(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
+
 	// 获取配置
 	GetWxPayConfig() *WxPayConfig
 	// 设置配置
@@ -80,7 +105,11 @@ type WxPayService interface {
 	// 获取提现接口
 	GetEntPayService() WxEntPayService
 
+	// 获取沙河环境
 	GetSandboxSignKey(*BaseWxPayRequest) (*WxPaySandboxSignKeyResult, error)
+
+	// 签名
+	Sign(params interface{}, st SignType, ignoreParams ...string) string
 }
 
 type WxPayV2ServiceImpl struct {
@@ -200,7 +229,7 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 			"noncestr":  nonceStr,
 			"appid":     appId,
 		}
-		sign := p.SignFor(configMap, request.SignType)
+		sign := p.Sign(configMap, request.SignType)
 		configMap["sign"] = sign
 		return json.Marshal(configMap)
 	case JSAPI:
@@ -219,7 +248,7 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 			"appid":     appId,
 			"sign_type": string(st),
 		}
-		sign := p.SignFor(configMap, request.SignType)
+		sign := p.Sign(configMap, request.SignType)
 		configMap["sign"] = sign
 		return json.Marshal(configMap)
 	default:
@@ -246,14 +275,20 @@ func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxP
 		}
 		request.Sign = re.SandboxSignkey
 	} else {
-		request.Sign = p.Sign(request)
+		request.Sign = p.sign(request)
 	}
 
 	url := p.GetPayBaseUr() + common.PayUnifiedOrder
 
 	var res WxPayUnifiedOrderResult
 	err := p.PostFor(&res, url, common.PostXml, request)
-
+	//
+	//if err == nil {
+	//	msg, b := res.CheckResult(p, request.SignType, true)
+	//	if !b {
+	//		return nil, fmt.Errorf(msg)
+	//	}
+	//}
 	return &res, err
 }
 
@@ -273,8 +308,7 @@ func (p *WxPayV2ServiceImpl) CloseOrder(request *WxPayOrderCloseRequest) (*WxPay
 
 	url := p.GetPayBaseUr() + common.PayCloseOrder
 
-	p.checkConfig(&request.BaseWxPayRequest)
-	request.Sign = p.Sign(request)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	var res WxPayOrderCloseResult
 	err := p.PostFor(&res, url, common.PostXml, request)
@@ -295,7 +329,6 @@ func (p *WxPayV2ServiceImpl) QueryOrder(request *WxPayOrderQueryRequest) (*WxPay
 
 	url := p.GetPayBaseUr() + common.PayQueryOrder
 
-	request.Sign = p.Sign(request)
 	request.Version = "1.0"
 
 	var res WxPayOrderQueryResult
@@ -309,8 +342,7 @@ func (p *WxPayV2ServiceImpl) Refund(request *WxPayRefundRequest) (*WxPayRefundRe
 		url = p.GetPayBaseUr() + common.PayRefundSandboxUrl
 	}
 
-	p.checkConfig(&request.BaseWxPayRequest)
-	request.Sign = p.Sign(request)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	var res WxPayRefundResult
 	err := p.PostKeyFor(&res, url, common.PostXml, request)
@@ -323,8 +355,7 @@ func (p *WxPayV2ServiceImpl) RefundV2(request *WxPayRefundRequest) (*WxPayRefund
 		url = p.GetPayBaseUr() + common.PayRefundSandboxUrlV2
 	}
 
-	p.checkConfig(&request.BaseWxPayRequest)
-	request.Sign = p.Sign(request)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	var res WxPayRefundResult
 	err := p.PostKeyFor(&res, url, common.PostXml, request)
@@ -334,8 +365,7 @@ func (p *WxPayV2ServiceImpl) RefundV2(request *WxPayRefundRequest) (*WxPayRefund
 func (p *WxPayV2ServiceImpl) RefundQuery(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error) {
 	url := p.GetPayBaseUr() + common.PayQueryRefundUrl
 
-	p.checkConfig(&request.BaseWxPayRequest)
-	request.Sign = p.Sign(request)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	var res WxPayRefundQueryResult
 	err := p.PostFor(&res, url, common.PostXml, request)
@@ -345,8 +375,7 @@ func (p *WxPayV2ServiceImpl) RefundQuery(request *WxPayRefundQueryRequest) (*WxP
 func (p *WxPayV2ServiceImpl) RefundQueryV2(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error) {
 	url := p.GetPayBaseUr() + common.PayQueryRefundUrlV2
 
-	p.checkConfig(&request.BaseWxPayRequest)
-	request.Sign = p.Sign(request)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	var res WxPayRefundQueryResult
 	err := p.PostFor(&res, url, common.PostXml, request)
@@ -393,30 +422,33 @@ func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *BaseWxPayRequest) (*WxPa
 		"mch_id":    request.MchId,
 		"nonce_str": request.NonceStr,
 	}
-	data["sign"] = p.SignFor(data, request.SignType)
+	data["sign"] = p.Sign(data, request.SignType)
 	err := p.PostFor(&res, url, "", data)
 
 	return &res, err
 }
 
 // 微信支付签名算法(详见:https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=4_3).
-func (p *WxPayV2ServiceImpl) SignFor(params interface{}, st SignType, ignoreParams ...string) string {
+func (p *WxPayV2ServiceImpl) Sign(params interface{}, st SignType, ignoreParams ...string) string {
 	sk := p.GetWxPayConfig().MchKey
+	if st == "" {
+		st = MD5
+	}
 	sign := SignFor(params, st, sk, ignoreParams...)
 	return strings.ToUpper(sign)
 }
 
 // 微信支付签名算法(详见:https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=4_3).
-func (p *WxPayV2ServiceImpl) Sign(params interface{}, ignoreParams ...string) string {
+func (p *WxPayV2ServiceImpl) sign(params interface{}, ignoreParams ...string) string {
 	st := p.GetWxPayConfig().SignType
-	return p.SignFor(params, st, ignoreParams...)
+	return p.Sign(params, st, ignoreParams...)
 }
 
 func (p *WxPayV2ServiceImpl) cover(request *WxPayUnifiedOrderRequest) {
 
 	c := p.GetWxPayConfig()
 
-	p.checkConfig(&request.BaseWxPayRequest)
+	request.CheckAndSign(p.GetWxPayConfig())
 
 	if request.NotifyUrl == "" {
 		request.NotifyUrl = c.NotifyUrl
@@ -428,33 +460,6 @@ func (p *WxPayV2ServiceImpl) cover(request *WxPayUnifiedOrderRequest) {
 		request.TradeType = JSAPI
 	}
 
-}
-
-func (p *WxPayV2ServiceImpl) checkConfig(request *BaseWxPayRequest) {
-
-	c := p.GetWxPayConfig()
-
-	if request.AppId == "" {
-		request.AppId = c.AppId
-	}
-	if request.SignType == "" {
-		request.SignType = c.SignType
-	}
-	if request.MchId == "" {
-		request.MchId = c.MchId
-	}
-	if request.SubAppId == "" {
-		request.SubAppId = c.SubAppId
-	}
-	if request.SubMchId == "" {
-		request.SubMchId = c.SubMchId
-	}
-	request.NonceStr = util.RandSeq(32)
-}
-
-func (p *WxPayV2ServiceImpl) checkResult() bool {
-
-	return false
 }
 
 func NewWxPayService(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {

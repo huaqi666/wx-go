@@ -9,6 +9,9 @@ const (
 	AccessTokenUrl = ApiDefaultHostUrl + "/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s"
 
 	ApiSuffix = "?access_token=%s"
+
+	Success = "SUCCESS"
+	Fail    = "FAIL"
 )
 
 // ma
@@ -50,6 +53,9 @@ const (
 	PayRefundSandboxUrlV2 = "/pay/refundv2"
 	PayQueryRefundUrl     = "/pay/refundquery"
 	PayQueryRefundUrlV2   = "/pay/refundqueryv2"
+
+	EntPayUrl      = "/mmpaymkttransfers/promotion/transfers"
+	EntPayQueryUrl = "/mmpaymkttransfers/gettransferinfo"
 )
 
 // http header
