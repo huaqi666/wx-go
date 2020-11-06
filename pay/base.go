@@ -65,6 +65,8 @@ type BaseWxPayRequest struct {
 
 // 基础响应对象
 type BaseWxPayResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+
 	common.Err
 	ResultCode string `json:"result_code" xml:"result_code"`
 	RetMsg     string `json:"retmsg" xml:"retmsg"`
@@ -81,6 +83,8 @@ type BaseWxPayResult struct {
 	SubMchId string `json:"sub_mch_id" xml:"sub_mch_id"`
 	NonceStr string `json:"nonce_str" xml:"nonce_str"`
 	Sign     string `json:"sign" xml:"sign"`
+
+	Content []byte `xml:",innerxml"`
 }
 
 func (r *BaseWxPayRequest) CheckAndSign(c *WxPayConfig) {
@@ -161,7 +165,7 @@ func (r *BaseWxPayResult) Compose() {
 }
 
 func (r *BaseWxPayResult) ToMap() map[string]interface{} {
-	return ToMap(r)
+	return util.ToMap(r)
 }
 
 func TrimToUpper(str string) string {

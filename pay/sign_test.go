@@ -1,6 +1,8 @@
 package pay
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSignFor(t *testing.T) {
 
@@ -15,11 +17,4 @@ func TestBuildSignStr(t *testing.T) {
 		AppId: "123",
 		MchId: "123",
 	}, "123"))
-}
-
-func TestToMap(t *testing.T) {
-	t.Log(ToMap(BaseWxPayRequest{
-		AppId: "123",
-		MchId: "123",
-	}))
 }

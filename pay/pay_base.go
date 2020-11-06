@@ -1,6 +1,12 @@
 package pay
 
-import "encoding/xml"
+import (
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
+	"github.com/beevik/etree"
+	"strconv"
+)
 
 // 默认参数，与基础参数一致
 type WxPayDefaultRequest struct {
@@ -136,20 +142,40 @@ type WxPayOrderQueryResult struct {
 	TradeState         string `json:"trade_state" xml:"trade_state"`
 	BankType           string `json:"bank_type" xml:"bank_type"`
 	Detail             string `json:"detail" xml:"detail"`
-	TotalFee           int    `json:"total_fee" xml:"total_fee"`
+	TotalFee           uint64 `json:"total_fee" xml:"total_fee"`
 	FeeType            string `json:"fee_type" xml:"fee_type"`
-	SettlementTotalFee int    `json:"settlement_total_fee" xml:"settlement_total_fee"`
-	CashFee            int    `json:"cash_fee" xml:"cash_fee"`
+	SettlementTotalFee uint64 `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	CashFee            uint64 `json:"cash_fee" xml:"cash_fee"`
 	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type"`
-	CouponFee          int    `json:"coupon_fee" xml:"coupon_fee"`
-	CouponCount        int    `json:"coupon_count" xml:"coupon_count"`
-	Coupons            string `json:"coupons" xml:"coupons"`
+	CouponFee          uint64 `json:"coupon_fee" xml:"coupon_fee"`
+	CouponCount        uint64 `json:"coupon_count" xml:"coupon_count"`
 	TransactionId      string `json:"transaction_id" xml:"transaction_id"`
 	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no"`
 	Attach             string `json:"attach" xml:"attach"`
 	TimeEnd            string `json:"time_end" xml:"time_end"`
 	TradeStateDesc     string `json:"trade_state_desc" xml:"trade_state_desc"`
-	// todo 优惠劵数据解析
+
+	Coupons []*WxPayOrderCoupon `json:"coupons" xml:"-"`
+}
+
+func (r WxPayOrderQueryResult) Compose() {
+	if r.CouponCount > 0 {
+		r.Coupons = []*WxPayOrderCoupon{}
+		doc := etree.NewDocument()
+		err := doc.ReadFromBytes(r.Content)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		for i := uint64(0); i < r.CouponCount; i++ {
+			fee, _ := strconv.ParseUint(doc.SelectAttrValue("coupon_fee_"+strconv.FormatUint(i, 10), ""), 10, 64)
+			r.Coupons = append(r.Coupons, &WxPayOrderCoupon{
+				CouponType: doc.SelectAttrValue("coupon_type_"+strconv.FormatUint(i, 10), ""),
+				CouponId:   doc.SelectAttrValue("coupon_id_"+strconv.FormatUint(i, 10), ""),
+				CouponFee:  fee,
+			})
+		}
+	}
 }
 
 // 订单关闭请求对象
@@ -233,6 +259,34 @@ type WxPayRefundResult struct {
 	CouponRefundCount     uint64 `json:"coupon_refund_count" xml:"coupon_refund_count"`
 	CouponRefundFee       uint64 `json:"coupon_refund_fee" xml:"coupon_refund_fee"`
 	PromotionDetailString string `json:"promotion_detail_string" xml:"promotion_detail_string"`
+
+	RefundCoupons    []*WxPayRefundCoupon          `json:"refund_coupons" xml:"-"`
+	PromotionDetails []*WxPayRefundPromotionDetail `json:"promotion_details" xml:"-"`
+}
+
+func (r *WxPayRefundResult) Compose() {
+	if r.CouponRefundCount > 0 {
+		r.RefundCoupons = []*WxPayRefundCoupon{}
+		doc := etree.NewDocument()
+		err := doc.ReadFromBytes(r.Content)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		for i := uint64(0); i < r.CouponRefundCount; i++ {
+			istr := strconv.FormatUint(i, 10)
+			fee, _ := strconv.ParseUint(doc.SelectAttrValue("coupon_refund_fee_"+istr, ""), 10, 64)
+			r.RefundCoupons = append(r.RefundCoupons, &WxPayRefundCoupon{
+				CouponType:      doc.SelectAttrValue("coupon_type_"+istr, ""),
+				CouponRefundId:  doc.SelectAttrValue("coupon_refund_id_"+istr, ""),
+				CouponRefundFee: fee,
+			})
+		}
+	}
+
+	if r.PromotionDetailString != "" {
+		_ = json.Unmarshal([]byte(r.PromotionDetailString), &r.PromotionDetails)
+	}
 }
 
 type WxPayRefundQueryRequest struct {
@@ -275,35 +329,108 @@ type WxPayRefundQueryResult struct {
 	CashFee               uint64 `json:"cash_fee" xml:"cash_fee"`
 	RefundCount           uint64 `json:"refund_count" xml:"refund_count"`
 	PromotionDetailString string `json:"promotion_detail_string" xml:"promotion_detail_string"`
-	// todo 数据解析
+
+	RefundRecords    []*WxPayRefundRecord          `json:"refund_records" xml:"-"`
+	PromotionDetails []*WxPayRefundPromotionDetail `json:"promotion_details" xml:"-"`
+}
+
+func (r *WxPayRefundQueryResult) Compose() {
+	if r.RefundCount > 0 {
+		r.RefundRecords = []*WxPayRefundRecord{}
+		doc := etree.NewDocument()
+		err := doc.ReadFromBytes(r.Content)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		for i := uint64(0); i < r.RefundCount; i++ {
+			istr := strconv.FormatUint(i, 10)
+
+			var rr WxPayRefundRecord
+			rr.OutRefundNo = doc.SelectAttrValue("out_refund_no_"+istr, "")
+			rr.RefundId = doc.SelectAttrValue("refund_id_"+istr, "")
+			rr.RefundChannel = doc.SelectAttrValue("refund_channel_"+istr, "")
+			var ii uint64
+			ii, _ = strconv.ParseUint(doc.SelectAttrValue("refund_fee_"+istr, ""), 10, 64)
+			rr.RefundFee = ii
+			ii, _ = strconv.ParseUint(doc.SelectAttrValue("settlement_refund_fee_"+istr, ""), 10, 64)
+			rr.SettlementRefundFee = ii
+			ii, _ = strconv.ParseUint(doc.SelectAttrValue("coupon_refund_fee_"+istr, ""), 10, 64)
+			rr.CouponRefundFee = ii
+			ii, _ = strconv.ParseUint(doc.SelectAttrValue("coupon_refund_count_"+istr, ""), 10, 64)
+			rr.CouponRefundCount = ii
+			rr.RefundStatus = doc.SelectAttrValue("refund_status_"+istr, "")
+			rr.RefundRecvAccount = doc.SelectAttrValue("refund_recv_accout_"+istr, "")
+			rr.RefundSuccessTime = doc.SelectAttrValue("refund_success_time_"+istr, "")
+
+			var rc []*WxPayRefundCoupon
+			for j := uint64(0); j < rr.CouponRefundCount; j++ {
+				jstr := strconv.FormatUint(j, 10)
+				fee, _ := strconv.ParseUint(doc.SelectAttrValue("coupon_refund_fee_"+istr+"_"+jstr, ""), 10, 64)
+				rc = append(rc, &WxPayRefundCoupon{
+					CouponType:      doc.SelectAttrValue("coupon_type_"+istr+"_"+jstr, ""),
+					CouponRefundId:  doc.SelectAttrValue("coupon_refund_id_"+istr+"_"+jstr, ""),
+					CouponRefundFee: fee,
+				})
+			}
+
+			rr.RefundCoupons = rc
+			r.RefundRecords = append(r.RefundRecords, &rr)
+		}
+	}
+
+	if r.PromotionDetailString != "" {
+		_ = json.Unmarshal([]byte(r.PromotionDetailString), &r.PromotionDetails)
+	}
 }
 
 type WxPayOrderNotifyResult struct {
 	BaseWxPayResult
 
-	PromotionDetail    string `json:"promotion_detail" xml:"promotion_detail"`
-	DeviceInfo         string `json:"device_info" xml:"device_info"`
-	Openid             string `json:"openid" xml:"openid"`
-	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe"`
-	SubOpenid          string `json:"sub_openid" xml:"sub_openid"`
-	SubIsSubscribe     string `json:"sub_is_subscribe" xml:"sub_is_subscribe"`
-	TradeType          string `json:"trade_type" xml:"trade_type"`
-	BankType           string `json:"bank_type" xml:"bank_type"`
-	TotalFee           string `json:"total_fee" xml:"total_fee"`
-	SettlementTotalFee string `json:"settlement_total_fee" xml:"settlement_total_fee"`
-	FeeType            string `json:"fee_type" xml:"fee_type"`
-	CashFee            string `json:"cash_fee" xml:"cash_fee"`
-	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type"`
-	CouponFee          string `json:"coupon_fee" xml:"coupon_fee"`
-	CouponCount        string `json:"coupon_count" xml:"coupon_count"`
-	// todo 解析coupon
-	TransactionId string   `json:"transaction_id" xml:"transaction_id"`
-	OutTradeNo    string   `json:"out_trade_no" xml:"out_trade_no"`
-	Attach        string   `json:"attach" xml:"attach"`
-	TimeEnd       string   `json:"time_end" xml:"time_end"`
-	Version       string   `json:"version" xml:"version"`
-	RateValue     string   `json:"rate_value" xml:"rate_value"`
-	SignType      SignType `json:"sign_type" xml:"sign_type"`
+	PromotionDetail    string   `json:"promotion_detail" xml:"promotion_detail"`
+	DeviceInfo         string   `json:"device_info" xml:"device_info"`
+	Openid             string   `json:"openid" xml:"openid"`
+	IsSubscribe        string   `json:"is_subscribe" xml:"is_subscribe"`
+	SubOpenid          string   `json:"sub_openid" xml:"sub_openid"`
+	SubIsSubscribe     string   `json:"sub_is_subscribe" xml:"sub_is_subscribe"`
+	TradeType          string   `json:"trade_type" xml:"trade_type"`
+	BankType           string   `json:"bank_type" xml:"bank_type"`
+	TotalFee           string   `json:"total_fee" xml:"total_fee"`
+	SettlementTotalFee string   `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	FeeType            string   `json:"fee_type" xml:"fee_type"`
+	CashFee            string   `json:"cash_fee" xml:"cash_fee"`
+	CashFeeType        string   `json:"cash_fee_type" xml:"cash_fee_type"`
+	CouponFee          string   `json:"coupon_fee" xml:"coupon_fee"`
+	CouponCount        uint64   `json:"coupon_count" xml:"coupon_count"`
+	TransactionId      string   `json:"transaction_id" xml:"transaction_id"`
+	OutTradeNo         string   `json:"out_trade_no" xml:"out_trade_no"`
+	Attach             string   `json:"attach" xml:"attach"`
+	TimeEnd            string   `json:"time_end" xml:"time_end"`
+	Version            string   `json:"version" xml:"version"`
+	RateValue          string   `json:"rate_value" xml:"rate_value"`
+	SignType           SignType `json:"sign_type" xml:"sign_type"`
+
+	Coupons []*WxPayOrderCoupon `json:"coupons" xml:"-"`
+}
+
+func (r *WxPayOrderNotifyResult) Compose() {
+	if r.CouponCount > 0 {
+		r.Coupons = []*WxPayOrderCoupon{}
+		doc := etree.NewDocument()
+		err := doc.ReadFromBytes(r.Content)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		for i := uint64(0); i < r.CouponCount; i++ {
+			fee, _ := strconv.ParseUint(doc.SelectAttrValue("coupon_fee_"+strconv.FormatUint(i, 10), ""), 10, 64)
+			r.Coupons = append(r.Coupons, &WxPayOrderCoupon{
+				CouponType: doc.SelectAttrValue("coupon_type_"+strconv.FormatUint(i, 10), ""),
+				CouponId:   doc.SelectAttrValue("coupon_id_"+strconv.FormatUint(i, 10), ""),
+				CouponFee:  fee,
+			})
+		}
+	}
 }
 
 type WxPayRefundNotifyResult struct {
@@ -311,7 +438,7 @@ type WxPayRefundNotifyResult struct {
 }
 
 // 提现请求对象
-type EntPayRequest struct {
+type WxEntPayRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
@@ -328,7 +455,7 @@ type EntPayRequest struct {
 }
 
 // 提现响应对象
-type EntPayResult struct {
+type WxEntPayResult struct {
 	BaseWxPayResult
 }
 

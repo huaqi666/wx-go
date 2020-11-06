@@ -3,7 +3,7 @@ package pay
 import "github.com/cliod/wx-go/common"
 
 type WxEntPayService interface {
-	EntPay(*EntPayRequest) (*EntPayResult, error)
+	EntPay(*WxEntPayRequest) (*WxEntPayResult, error)
 	QueryEntPayBy(partnerTradeNo string) (*EntPayQueryResult, error)
 	QueryEntPay(request *EntPayQueryRequest) (*EntPayQueryResult, error)
 
@@ -27,11 +27,11 @@ func newWxEntPayService(service WxPayService) *WxEntPayServiceImpl {
 	}
 }
 
-func (w *WxEntPayServiceImpl) EntPay(request *EntPayRequest) (*EntPayResult, error) {
+func (w *WxEntPayServiceImpl) EntPay(request *WxEntPayRequest) (*WxEntPayResult, error) {
 	url := w.service.GetPayBaseUr() + common.EntPayUrl
 	request.Sign = w.service.Sign(request, request.SignType)
 
-	var res EntPayResult
+	var res WxEntPayResult
 	err := w.service.PostKeyFor(&res, url, common.PostXml, request)
 	return &res, err
 }
