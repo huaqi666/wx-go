@@ -34,6 +34,7 @@ type WxPayRequest interface {
 	NeedNonceStr() bool
 
 	GetSignType() SignType
+	IgnoredParamsForSign() []string
 }
 
 type WxPayResult interface {
@@ -81,6 +82,7 @@ type BaseWxPayResult struct {
 	MchId    string `json:"mch_id" xml:"mch_id"`
 	SubAppId string `json:"sub_app_id" xml:"sub_app_id"`
 	SubMchId string `json:"sub_mch_id" xml:"sub_mch_id"`
+	// 以时间戳为随机字符串，可以不设置.
 	NonceStr string `json:"nonce_str" xml:"nonce_str"`
 	Sign     string `json:"sign" xml:"sign"`
 
@@ -116,7 +118,7 @@ func (r *BaseWxPayRequest) CheckAndSign(c *WxPayConfig) {
 	if r.NeedNonceStr() && r.NonceStr == "" {
 		r.NonceStr = util.RandSeq(32)
 	}
-	r.Sign = SignFor(r, r.SignType, c.MchKey)
+	r.Sign = Sign(r, r.SignType, c.MchKey, r.IgnoredParamsForSign()...)
 }
 
 func (r *BaseWxPayRequest) IsIgnoreAppId() bool {
@@ -137,6 +139,10 @@ func (r *BaseWxPayRequest) NeedNonceStr() bool {
 
 func (r *BaseWxPayRequest) GetSignType() SignType {
 	return r.SignType
+}
+
+func (r *BaseWxPayRequest) IgnoredParamsForSign() []string {
+	return []string{}
 }
 
 func (r *BaseWxPayResult) Error() string {

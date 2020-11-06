@@ -6,7 +6,7 @@ import (
 
 func TestSignFor(t *testing.T) {
 
-	t.Log(SignFor(BaseWxPayRequest{
+	t.Log(Sign(BaseWxPayRequest{
 		AppId: "123",
 		MchId: "123",
 	}, MD5, ""))

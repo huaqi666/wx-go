@@ -9,12 +9,33 @@ import (
 
 var Ignores = []string{"sign", "key", "xmlString", "xmlDoc", "couponList"}
 
-func SignFor(params interface{}, st SignType, sk string, ignoreParams ...string) string {
+func Sign(params interface{}, st SignType, sk string, ignoreParams ...string) string {
 	signStr := buildSignStr(params, sk, ignoreParams...)
 	var sign string
 	switch st {
 	case HmacSha256:
 		sign = util.HmacSha256(signStr, sk)
+	case MD5:
+		sign = util.Md5(signStr)
+	}
+	return sign
+}
+
+func SignEnt(actName, mchBillNo, mchId, nonceStr, reOpenid, wxAppId, signKey string, totalAmount uint64, st SignType) string {
+	sortedMap := map[string]interface{}{}
+	sortedMap["act_name"] = actName
+	sortedMap["mch_billno"] = mchBillNo
+	sortedMap["mch_id"] = mchId
+	sortedMap["nonce_str"] = nonceStr
+	sortedMap["re_openid"] = reOpenid
+	sortedMap["total_amount"] = totalAmount
+	sortedMap["wxappid"] = wxAppId
+
+	signStr := strings.Replace(buildSignStr(sortedMap, ""), "&key=", "&secret=", 1) + signKey
+	var sign string
+	switch st {
+	case HmacSha256:
+		sign = util.HmacSha256(signStr, signKey)
 	case MD5:
 		sign = util.Md5(signStr)
 	}

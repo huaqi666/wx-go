@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/beevik/etree"
+	"github.com/cliod/wx-go/common"
 	"strconv"
 )
 
@@ -413,6 +414,13 @@ type WxPayOrderNotifyResult struct {
 	Coupons []*WxPayOrderCoupon `json:"coupons" xml:"-"`
 }
 
+func (r WxPayOrderNotifyResult) CheckResult(service WxPayService, signType SignType, checkSuccess bool) error {
+	if r.ReturnCode == common.Success && r.Sign == "" {
+		return common.ErrorOf("伪造的通知!")
+	}
+	return r.BaseWxPayResult.CheckResult(service, signType, checkSuccess)
+}
+
 func (r *WxPayOrderNotifyResult) Compose() {
 	if r.CouponCount > 0 {
 		r.Coupons = []*WxPayOrderCoupon{}
@@ -437,29 +445,7 @@ type WxPayRefundNotifyResult struct {
 	BaseWxPayResult
 }
 
-// 提现请求对象
-type WxEntPayRequest struct {
-	XMLName xml.Name `xml:"xml" json:"-"`
-	BaseWxPayRequest
-
-	MchAppid       string `json:"mch_appid" xml:"mch_appid"`
-	MchId          string `json:"mchid" xml:"mchid"`
-	DeviceInfo     string `json:"device_info" xml:"device_info"`
-	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
-	Openid         string `json:"openid" xml:"openid"`
-	CheckName      string `json:"check_name" xml:"check_name"`
-	ReUserName     string `json:"re_user_name" xml:"re_user_name"`
-	Amount         uint64 `json:"amount" xml:"amount"`
-	Description    string `json:"description" xml:"description"`
-	SpbillCreateIp string `json:"spbill_create_ip" xml:"spbill_create_ip"`
-}
-
-// 提现响应对象
-type WxEntPayResult struct {
-	BaseWxPayResult
-}
-
-//
+// 沙河请求签名结果
 type WxPaySandboxSignKeyResult struct {
 	BaseWxPayResult
 	SandboxSignkey string `json:"sandbox_signkey" xml:"sandbox_signkey"`

@@ -97,6 +97,9 @@ type WxPayService interface {
 	   2、请求频率限制：300qps，即每秒钟正常的退款查询请求次数不超过300次
 	   3、错误或无效请求频率限制：6qps，即每秒钟异常或错误的退款查询请求不超过6次 */
 	RefundQueryV2(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
+	/* 解析支付结果通知.
+	   详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7 */
+	ParseOrderNotifyResult(xmlData string, signType SignType) (*WxPayOrderNotifyResult, error)
 
 	// 获取配置
 	GetWxPayConfig() *WxPayConfig
@@ -129,7 +132,7 @@ func newWxPayService(config *WxPayConfig) *WxPayV2ServiceImpl {
 
 func (p *WxPayV2ServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	if contentType == "" {
-		contentType = common.PostXml
+		contentType = common.PostXmlContentType
 	}
 	return p.http.Post(url, contentType, data, args...)
 }
@@ -158,7 +161,7 @@ func (p *WxPayV2ServiceImpl) PostKey(url, contentType string, data interface{}, 
 	}
 	ser := common.NewXmlServiceFor(cli)
 	if contentType == "" {
-		contentType = common.PostXml
+		contentType = common.PostXmlContentType
 	}
 	return ser.Post(url, contentType, data, args...)
 }
@@ -370,7 +373,7 @@ func (p *WxPayV2ServiceImpl) ParseOrderNotifyResult(xmlData string, signType Sig
 			signType = p.GetWxPayConfig().SignType
 		}
 	}
-
+	err = res.CheckResult(p, signType, false)
 	return &res, err
 }
 
@@ -399,7 +402,7 @@ func (p *WxPayV2ServiceImpl) Sign(params interface{}, st SignType, ignoreParams 
 	if st == "" {
 		st = MD5
 	}
-	sign := SignFor(params, st, sk, ignoreParams...)
+	sign := Sign(params, st, sk, ignoreParams...)
 	return strings.ToUpper(sign)
 }
 
@@ -409,9 +412,9 @@ func (p *WxPayV2ServiceImpl) Do(url string, request WxPayRequest, res WxPayResul
 
 	var err error
 	if useKey {
-		err = p.PostKeyFor(&res, url, common.PostXml, request)
+		err = p.PostKeyFor(&res, url, common.PostXmlContentType, request)
 	} else {
-		err = p.PostFor(&res, url, common.PostXml, request)
+		err = p.PostFor(&res, url, common.PostXmlContentType, request)
 	}
 
 	if err == nil {

@@ -54,12 +54,17 @@ const (
 	PayQueryRefundUrl     = "/pay/refundquery"
 	PayQueryRefundUrlV2   = "/pay/refundqueryv2"
 
-	EntPayUrl      = "/mmpaymkttransfers/promotion/transfers"
-	EntPayQueryUrl = "/mmpaymkttransfers/gettransferinfo"
+	EntPayUrl          = "/mmpaymkttransfers/promotion/transfers"
+	EntPayQueryUrl     = "/mmpaymkttransfers/gettransferinfo"
+	EntPayBankUrl      = "/mmpaysptrans/pay_bank"
+	EntPayQueryBankUrl = "/mmpaysptrans/query_bank"
+
+	EntSendEnterpriseRedPackUrl  = "/mmpaymkttransfers/sendworkwxredpack"
+	EntQueryEnterpriseRedPackUrl = "/mmpaymkttransfers/queryworkwxredpack"
 )
 
 // http header
 const (
-	PostXml  = "application/xml; charset=utf-8"
-	PostJson = "application/json; charset=utf-8"
+	PostXmlContentType  = "application/xml; charset=utf-8"
+	PostJsonContentType = "application/json; charset=utf-8"
 )
