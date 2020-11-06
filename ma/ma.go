@@ -20,8 +20,12 @@ type WxMaService interface {
 
 	// 获取用户接口
 	GetWxMaUserService() WxMaUserService
+	// 设置(用户自定义的)用户接口
+	SetWxMaUserService(userService WxMaUserService)
 	// 获取二维码接口
 	GetWxMaQrcodeService() WxMaQrcodeService
+	// 设置(用户自定义的)二维码接口
+	SetWxMaQrcodeService(qrcodeService WxMaQrcodeService)
 }
 
 type WxMaServiceImpl struct {
@@ -32,17 +36,13 @@ type WxMaServiceImpl struct {
 	qrCodeService WxMaQrcodeService
 }
 
-func newWxMaServiceFor(config WxMaConfig) *WxMaServiceImpl {
+func newWxMaService(config WxMaConfig) *WxMaServiceImpl {
 	impl := WxMaServiceImpl{}
 	impl.SetHttpService(common.NewService())
 	impl.SetWxMaConfig(config)
 	impl.userService = newWxMaUserService(&impl)
 	impl.qrCodeService = newWxMaQrcodeService(&impl)
 	return &impl
-}
-
-func newWxMaService(appId, secret string) *WxMaServiceImpl {
-	return newWxMaServiceFor(newWxMaConfig(appId, secret))
 }
 
 func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error) {
@@ -63,6 +63,14 @@ func (s *WxMaServiceImpl) GetWxMaQrcodeService() WxMaQrcodeService {
 	return s.qrCodeService
 }
 
+func (s *WxMaServiceImpl) SetWxMaUserService(userService WxMaUserService) {
+	s.userService = userService
+}
+
+func (s *WxMaServiceImpl) SetWxMaQrcodeService(qrcodeService WxMaQrcodeService) {
+	s.qrCodeService = qrcodeService
+}
+
 func (s *WxMaServiceImpl) GetWxMaConfig() WxMaConfig {
 	return s.config
 }
@@ -74,9 +82,12 @@ func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
 }
 
 func NewWxMaService(appId, secret string) WxMaService {
-	return newWxMaService(appId, secret)
+	return newWxMaService(newWxMaConfig(appId, secret))
 }
 
-func NewWxMaServiceFor(config WxMaConfig) WxMaService {
-	return newWxMaServiceFor(config)
+func NewWxMaServiceBy(config WxMaConfig) WxMaService {
+	if config == nil {
+		config = new(WxMaConfigImpl)
+	}
+	return newWxMaService(config)
 }

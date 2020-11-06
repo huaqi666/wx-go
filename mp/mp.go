@@ -2,9 +2,6 @@ package mp
 
 import (
 	"github.com/cliod/wx-go/common"
-	"github.com/cliod/wx-go/common/util"
-	"strconv"
-	"time"
 )
 
 type WxMpService interface {
@@ -36,8 +33,12 @@ type WxMpService interface {
 
 	// 获取用户接口
 	GetWxMpUserService() WxMpUserService
+	// 设置(用户自定义的)用户接口
+	SetWxMpUserService(WxMpUserService)
 	// 获取二维码接口
 	GetWxMpQrcodeService() WxMpQrcodeService
+	// 设置(用户自定义的)二维码接口
+	SetWxMpQrcodeService(WxMpQrcodeService)
 }
 
 type WxMpServiceImpl struct {
@@ -45,20 +46,16 @@ type WxMpServiceImpl struct {
 
 	config        WxMpConfig
 	userService   WxMpUserService
-	qrCodeService WxMpQrcodeService
+	qrcodeService WxMpQrcodeService
 }
 
-func newWxMpServiceFor(config WxMpConfig) *WxMpServiceImpl {
+func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
 	impl := WxMpServiceImpl{}
 	impl.SetHttpService(common.NewService())
 	impl.SetWxMpConfig(config)
 	impl.userService = newWxMpUserService(&impl)
-	impl.qrCodeService = newWxMpQrcodeService(&impl)
+	impl.qrcodeService = newWxMpQrcodeService(&impl)
 	return &impl
-}
-
-func newWxMpService(appId, secret string) *WxMpServiceImpl {
-	return newWxMpServiceFor(newWxMpConfig(appId, secret))
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
@@ -100,21 +97,9 @@ func (s *WxMpServiceImpl) getTicket(ticketType TicketType) (*Ticket, error) {
 }
 
 func (s *WxMpServiceImpl) CreateJsapiSignature(url string) (*WxJsapiSignature, error) {
-	timestamp := strconv.Itoa(time.Now().Second())
-	randomStr := util.RandSeq(16)
 	jsapiTicket, _ := s.GetJsapiTicket()
-	arr := []string{"jsapi_ticket=" + jsapiTicket.Ticket, "noncestr=" + randomStr, "timestamp=" + timestamp, "url=" + url}
-	signature, err := util.GenWithAmple(arr)
-	if err != nil {
-		return nil, err
-	}
-	return &WxJsapiSignature{
-		AppId:     s.GetWxMpConfig().GetAppID(),
-		Timestamp: timestamp,
-		NonceStr:  randomStr,
-		Url:       url,
-		Signature: signature,
-	}, nil
+	appId := s.GetWxMpConfig().GetAppID()
+	return CreateJsapiSignature(url, appId, jsapiTicket.Ticket)
 }
 
 func (s *WxMpServiceImpl) GetWxMpUserService() WxMpUserService {
@@ -122,7 +107,15 @@ func (s *WxMpServiceImpl) GetWxMpUserService() WxMpUserService {
 }
 
 func (s *WxMpServiceImpl) GetWxMpQrcodeService() WxMpQrcodeService {
-	return s.qrCodeService
+	return s.qrcodeService
+}
+
+func (s *WxMpServiceImpl) SetWxMpUserService(userService WxMpUserService) {
+	s.userService = userService
+}
+
+func (s *WxMpServiceImpl) SetWxMpQrcodeService(qrcodeService WxMpQrcodeService) {
+	s.qrcodeService = qrcodeService
 }
 
 func (s *WxMpServiceImpl) GetWxMpConfig() WxMpConfig {
@@ -136,9 +129,12 @@ func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
 }
 
 func NewWxMpService(appId, secret string) WxMpService {
-	return newWxMpService(appId, secret)
+	return newWxMpService(newWxMpConfig(appId, secret))
 }
 
-func NewWxMpServiceFor(config WxMpConfig) WxMpService {
-	return newWxMpServiceFor(config)
+func NewWxMpServiceBy(config WxMpConfig) WxMpService {
+	if config == nil {
+		config = new(WxMpConfigImpl)
+	}
+	return newWxMpService(config)
 }

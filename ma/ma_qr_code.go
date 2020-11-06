@@ -39,34 +39,6 @@ type WxMaQrcodeService interface {
 	CreateWxaCodeUnlimited(scene, page string) ([]byte, error)
 }
 
-type BaseCode struct {
-	Width     int           `json:"width"`
-	AutoColor bool          `json:"auto_color"`
-	IsHyaline bool          `json:"is_hyaline"`
-	LineColor CodeLineColor `json:"line_color"`
-}
-
-type WxaCode struct {
-	BaseCode
-	Path string `json:"path"`
-}
-
-type WxaCodeUnlimited struct {
-	BaseCode
-	Scene string `json:"scene"`
-	Page  string `json:"page"`
-}
-
-type CodeLineColor struct {
-	R string
-	B string
-	G string
-}
-
-func DefaultCodeLineColor() CodeLineColor {
-	return CodeLineColor{R: "0", B: "0", G: "0"}
-}
-
 type WxMaQrCodeServiceImpl struct {
 	service WxMaService
 }

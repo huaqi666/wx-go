@@ -54,3 +54,7 @@ func (c *WxMaConfigImpl) GetAesKey() string {
 func (c *WxMaConfigImpl) GetMsgDataFormat() string {
 	return c.MsgDataFormat
 }
+
+func NewWxMaConfig(appId, secret string) WxMaConfig {
+	return newWxMaConfig(appId, secret)
+}
