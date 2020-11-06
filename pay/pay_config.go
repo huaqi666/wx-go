@@ -5,6 +5,8 @@ import (
 )
 
 type WxPayConfig struct {
+	PayBaseUrl string `json:"pay_base_url"` // 微信支付接口请求地址域名部分.
+
 	AppId     string    `json:"app_id"`      // 公众号/小程序 appid
 	MchId     string    `json:"mch_id"`      // 微信支付商户号.
 	MchKey    string    `json:"mch_key"`     // 微信支付商户密钥.
@@ -16,20 +18,18 @@ type WxPayConfig struct {
 	SignType  SignType  `json:"sign_type"`   // 签名方式.
 	EntPayKey string    `json:"ent_pay_key"` // 企业支付密钥.
 
-	PrivateKeyPath     string `json:"private_key_path"`     // apiv3 商户apiclient_key.pem
-	PrivateCertPath    string `json:"private_cert_path"`    // apiv3 商户apiclient_cert.pem
-	ApiV3Key           string `json:"api_v_3_key"`          // apiV3 秘钥值.
-	CertSerialNo       string `json:"cert_serial_no"`       // apiV3 证书序列号值
-	ServiceId          string `json:"service_id"`           // 微信支付分serviceId
-	PayScoreNotifyUrl  string `json:"pay_score_notify_url"` // 微信支付分回调地址
-	PrivateKey         string `json:"private_key"`          // 私钥信息
-	ApiV3HttpClient    string `json:"api_v_3_http_client"`
-	CertAutoUpdateTime int    `json:"cert_auto_update_time"` // 证书自动更新时间差(分钟)，默认一分钟
-	KeyContent         []byte `json:"key_content"`           //  p12证书文件内容的字节数组.
+	PrivateKeyPath  string `json:"private_key_path"`  // apiv3 商户apiclient_key.pem
+	PrivateCertPath string `json:"private_cert_path"` // apiv3 商户apiclient_cert.pem
 
-	PayBaseUrl            string `json:"pay_base_url"`            // 微信支付接口请求地址域名部分.
-	HttpConnectionTimeout int    `json:"http_connection_timeout"` // http请求连接超时时间 5000
-	HttpTimeout           int    `json:"http_timeout"`            // http请求数据读取等待时间 10000
+	ApiV3Key           string `json:"api_v_3_key"`           // apiV3 秘钥值.
+	CertSerialNo       string `json:"cert_serial_no"`        // apiV3 证书序列号值
+	ServiceId          string `json:"service_id"`            // 微信支付分serviceId
+	PayScoreNotifyUrl  string `json:"pay_score_notify_url"`  // 微信支付分回调地址
+	PrivateKey         string `json:"private_key"`           // 私钥信息
+	CertAutoUpdateTime int    `json:"cert_auto_update_time"` // 证书自动更新时间差(分钟)，默认一分钟
+
+	HttpConnectionTimeout int `json:"http_connection_timeout"` // http请求连接超时时间 5000
+	HttpTimeout           int `json:"http_timeout"`            // http请求数据读取等待时间 10000
 
 	UseSandboxEnv     bool   `json:"use_sandbox_env"`
 	IfSaveApiData     bool   `json:"if_save_api_data"`
@@ -55,5 +55,7 @@ func NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConf
 		KeyPath:   keyPath,
 		TradeType: JSAPI,
 		SignType:  MD5,
+
+		PayBaseUrl: common.PayDefaultPayBaseUrl,
 	}
 }

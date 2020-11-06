@@ -23,26 +23,10 @@ const (
 	MD5        SignType = "MD5"
 )
 
-type BaseWxPayResult struct {
-	common.Err
-	RetMsg string `json:"retmsg" xml:"retmsg"`
-
-	ReturnCode string `json:"return_code" xml:"return_code"`
-	ReturnMsg  string `json:"return_msg" xml:"return_msg"`
-
-	ResultCode string `json:"result_code" xml:"result_code"`
-	ErrCode    string `json:"err_code" xml:"err_code"`
-	ErrCodeDes string `json:"err_code_des" xml:"err_code_des"`
-	AppId      string `json:"appid" xml:"appid"`
-	MchId      string `json:"mch_id" xml:"mch_id"`
-	SubAppId   string `json:"sub_app_id" xml:"sub_app_id"`
-	SubMchId   string `json:"sub_mch_id" xml:"sub_mch_id"`
-	NonceStr   string `json:"nonce_str" xml:"nonce_str"`
-	Sign       string `json:"sign" xml:"sign"`
-}
-
+// 基础请求对象
 type BaseWxPayRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
+
 	// 公众号或者小程序appId
 	AppId string `json:"appid" xml:"appid"`
 	// 商户号.
@@ -61,6 +45,27 @@ type BaseWxPayRequest struct {
 	WorkWxSign string `json:"work_wx_sign,omitempty" xml:"work_wx_sign,omitempty"`
 }
 
+// 基础响应对象
+type BaseWxPayResult struct {
+	common.Err
+	ResultCode string `json:"result_code" xml:"result_code"`
+	RetMsg     string `json:"retmsg" xml:"retmsg"`
+
+	ReturnCode string `json:"return_code" xml:"return_code"`
+	ReturnMsg  string `json:"return_msg" xml:"return_msg"`
+
+	ErrCode    string `json:"err_code" xml:"err_code"`
+	ErrCodeDes string `json:"err_code_des" xml:"err_code_des"`
+
+	AppId    string `json:"appid" xml:"appid"`
+	MchId    string `json:"mch_id" xml:"mch_id"`
+	SubAppId string `json:"sub_app_id" xml:"sub_app_id"`
+	SubMchId string `json:"sub_mch_id" xml:"sub_mch_id"`
+	NonceStr string `json:"nonce_str" xml:"nonce_str"`
+	Sign     string `json:"sign" xml:"sign"`
+}
+
+// 统一下单请求对象
 type WxPayUnifiedOrderRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
@@ -130,8 +135,11 @@ type WxPayUnifiedOrderRequest struct {
 	ProfitSharing string    `json:"profit_sharing,omitempty" xml:"profit_sharing,omitempty"`
 }
 
+// 统一下单响应对象
 type WxPayUnifiedOrderResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
+
 	// 微信生成的预支付回话标识，用于后续接口调用中使用，该值有效期为2小时
 	PrepayId string `json:"prepay_id" xml:"prepay_id"`
 	// 交易类型，取值为：JSAPI，NATIVE，APP等
@@ -142,58 +150,9 @@ type WxPayUnifiedOrderResult struct {
 	CodeURL string `json:"code_url" xml:"code_url"`
 }
 
-type WxPayOrderCloseResult struct {
-	BaseWxPayResult
-	// 业务结果描述
-	ResultMsg string `json:"result_msg" xml:"result_msg"`
-}
-
-type WxPayOrderQueryResult struct {
-	BaseWxPayResult
-
-	PromotionDetail    string    `json:"promotion_detail" xml:"promotion_detail"`
-	DeviceInfo         string    `json:"device_info" xml:"device_info"`
-	Openid             string    `json:"openid" xml:"openid"`
-	IsSubscribe        string    `json:"is_subscribe" xml:"is_subscribe"`
-	SubOpenid          string    `json:"sub_openid" xml:"sub_openid"`
-	IsSubscribeSub     string    `json:"is_subscribe_sub" xml:"is_subscribe_sub"`
-	TradeType          string    `json:"trade_type" xml:"trade_type"`
-	TradeState         string    `json:"trade_state" xml:"trade_state"`
-	BankType           string    `json:"bank_type" xml:"bank_type"`
-	Detail             string    `json:"detail" xml:"detail"`
-	TotalFee           int       `json:"total_fee" xml:"total_fee"`
-	FeeType            string    `json:"fee_type" xml:"fee_type"`
-	SettlementTotalFee int       `json:"settlement_total_fee" xml:"settlement_total_fee"`
-	CashFee            int       `json:"cash_fee" xml:"cash_fee"`
-	CashFeeType        string    `json:"cash_fee_type" xml:"cash_fee_type"`
-	CouponFee          int       `json:"coupon_fee" xml:"coupon_fee"`
-	CouponCount        int       `json:"coupon_count" xml:"coupon_count"`
-	Coupons            []*Coupon `json:"coupons" xml:"coupons"`
-	TransactionId      string    `json:"transaction_id" xml:"transaction_id"`
-	OutTradeNo         string    `json:"out_trade_no" xml:"out_trade_no"`
-	Attach             string    `json:"attach" xml:"attach"`
-	TimeEnd            string    `json:"time_end" xml:"time_end"`
-	TradeStateDesc     string    `json:"trade_state_desc" xml:"trade_state_desc"`
-}
-
-type Coupon struct {
-	CouponType string `json:"coupon_type" xml:"coupon_type"`
-	CouponId   string `json:"coupon_id" xml:"coupon_id"`
-	CouponFee  int    `json:"coupon_fee" xml:"coupon_fee"`
-}
-
-func ComposeCoupons(value string) []*Coupon {
-	//todo
-	return nil
-}
-
-type WxPayOrderCloseRequest struct {
-	BaseWxPayRequest
-
-	OutTradeNo string `json:"out_trade_no" xml:"out_trade_no"`
-}
-
+// 订单查询请求对象
 type WxPayOrderQueryRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
 	Version       string `json:"version" xml:"version"`
@@ -201,13 +160,201 @@ type WxPayOrderQueryRequest struct {
 	OutTradeNo    string `json:"out_trade_no" xml:"out_trade_no"`
 }
 
+// 订单查询响应对象
+type WxPayOrderQueryResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayResult
+
+	PromotionDetail    string `json:"promotion_detail" xml:"promotion_detail"`
+	DeviceInfo         string `json:"device_info" xml:"device_info"`
+	Openid             string `json:"openid" xml:"openid"`
+	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe"`
+	SubOpenid          string `json:"sub_openid" xml:"sub_openid"`
+	IsSubscribeSub     string `json:"is_subscribe_sub" xml:"is_subscribe_sub"`
+	TradeType          string `json:"trade_type" xml:"trade_type"`
+	TradeState         string `json:"trade_state" xml:"trade_state"`
+	BankType           string `json:"bank_type" xml:"bank_type"`
+	Detail             string `json:"detail" xml:"detail"`
+	TotalFee           int    `json:"total_fee" xml:"total_fee"`
+	FeeType            string `json:"fee_type" xml:"fee_type"`
+	SettlementTotalFee int    `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	CashFee            int    `json:"cash_fee" xml:"cash_fee"`
+	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type"`
+	CouponFee          int    `json:"coupon_fee" xml:"coupon_fee"`
+	CouponCount        int    `json:"coupon_count" xml:"coupon_count"`
+	Coupons            string `json:"coupons" xml:"coupons"`
+	TransactionId      string `json:"transaction_id" xml:"transaction_id"`
+	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no"`
+	Attach             string `json:"attach" xml:"attach"`
+	TimeEnd            string `json:"time_end" xml:"time_end"`
+	TradeStateDesc     string `json:"trade_state_desc" xml:"trade_state_desc"`
+	// todo 优惠劵数据解析
+}
+
+// 订单关闭请求对象
+type WxPayOrderCloseRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayRequest
+
+	// 订单支付编号
+	OutTradeNo string `json:"out_trade_no" xml:"out_trade_no"`
+}
+
+// 订单关闭响应对象
+type WxPayOrderCloseResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayResult
+
+	// 业务结果描述
+	ResultMsg string `json:"result_msg" xml:"result_msg"`
+}
+
+// 退款请求对象
+type WxPayRefundRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayRequest
+
+	// 必填 ...
+	// transaction_id 和 out_trade_no 二选一
+	TransactionId string `json:"transaction_id,omitempty" xml:"transaction_id,omitempty"`
+	// transaction_id 和 out_trade_no 二选一
+	OutTradeNo string `json:"out_trade_no,omitempty" xml:"out_trade_no,omitempty"`
+	// 商户系统内部的退款单号，商户系统内部唯一，只能是数字、大小写字母_-|*@ ，同一退款单号多次请求只退一笔。
+	OutRefundNo string `json:"out_refund_no" xml:"out_refund_no"`
+	// 订单总金额，单位为分，只能为整数
+	TotalFee uint64 `json:"total_fee" xml:"total_fee"`
+	// 退款金额，最大订单总金额，单位为分，只能为整数
+	RefundFee uint64 `json:"refund_fee" xml:"refund_fee"`
+
+	// 选填 ...
+	DeviceInfo    string `json:"device_info,omitempty" xml:"device_info,omitempty"`
+	RefundFeeType string `json:"refund_fee_type,omitempty" xml:"refund_fee_type,omitempty"`
+	OpUserId      string `json:"op_user_id,omitempty" xml:"op_user_id,omitempty"`
+	RefundAccount string `json:"refund_account,omitempty" xml:"refund_account,omitempty"`
+	RefundDesc    string `json:"refund_desc,omitempty" xml:"refund_desc,omitempty"`
+	NotifyUrl     string `json:"notify_url,omitempty" xml:"notify_url,omitempty"`
+	Detail        string `json:"detail,omitempty" xml:"detail,omitempty"`
+}
+
+// 退款响应对象
+type WxPayRefundResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayResult
+
+	// transaction_id 和 out_trade_no 二选一
+	TransactionId string `json:"transaction_id,omitempty" xml:"transaction_id,omitempty"`
+	// transaction_id 和 out_trade_no 二选一
+	OutTradeNo string `json:"out_trade_no,omitempty" xml:"out_trade_no,omitempty"`
+	// 商户系统内部的退款单号，商户系统内部唯一，只能是数字、大小写字母_-|*@ ，同一退款单号多次请求只退一笔。
+	OutRefundNo string `json:"out_refund_no" xml:"out_refund_no"`
+	// 微信退款单号.
+	RefundId string `json:"refund_id" xml:"refund_id"`
+	// 退款金额，最大订单总金额，单位为分，只能为整数
+	RefundFee uint64 `json:"refund_fee" xml:"refund_fee"`
+	// 订单总金额，单位为分，只能为整数
+	TotalFee uint64 `json:"total_fee" xml:"total_fee"`
+
+	SettlementRefundFee   uint64 `json:"settlement_refund_fee" xml:"settlement_refund_fee"`
+	SettlementTotalFee    uint64 `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	FeeType               string `json:"fee_type" xml:"fee_type"`
+	CashFee               uint64 `json:"cash_fee" xml:"cash_fee"`
+	CashFeeType           string `json:"cash_fee_type" xml:"cash_fee_type"`
+	CashRefundFee         uint64 `json:"cash_refund_fee" xml:"cash_refund_fee"`
+	CouponRefundCount     uint64 `json:"coupon_refund_count" xml:"coupon_refund_count"`
+	CouponRefundFee       uint64 `json:"coupon_refund_fee" xml:"coupon_refund_fee"`
+	PromotionDetailString string `json:"promotion_detail_string" xml:"promotion_detail_string"`
+}
+
+type WxPayRefundQueryRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayRequest
+
+	// 必填 ...
+	// 以下四选一
+	// 微信订单号
+	TransactionId string `json:"transaction_id" xml:"transaction_id"`
+	// 微信订单号
+	OutTradeNo string `json:"out_trade_no" xml:"out_trade_no"`
+	// 商户退款单号
+	OutRefundNo string `json:"out_refund_no" xml:"out_refund_no"`
+	// 商户退款单号
+	RefundId string `json:"refund_id" xml:"refund_id"`
+	// 订单总金额，单位为分，只能为整数
+	TotalFee uint64 `json:"total_fee" xml:"total_fee"`
+
+	// 选填 ...
+	// 设备号
+	DeviceInfo string `json:"device_info" xml:"device_info"`
+}
+
+type WxPayRefundQueryResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayResult
+
+	// 微信订单号
+	TransactionId string `json:"transaction_id" xml:"transaction_id"`
+	// 微信订单号
+	OutTradeNo string `json:"out_trade_no" xml:"out_trade_no"`
+	// 订单总金额，单位为分，只能为整数
+	TotalFee uint64 `json:"total_fee" xml:"total_fee"`
+
+	// 设备号
+	DeviceInfo            string `json:"device_info" xml:"device_info"`
+	SettlementTotalFee    uint64 `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	FeeType               string `json:"fee_type" xml:"fee_type"`
+	CashFee               uint64 `json:"cash_fee" xml:"cash_fee"`
+	RefundCount           uint64 `json:"refund_count" xml:"refund_count"`
+	PromotionDetailString string `json:"promotion_detail_string" xml:"promotion_detail_string"`
+	// todo 数据解析
+}
+
+type WxPayOrderNotifyResult struct {
+	BaseWxPayResult
+
+	PromotionDetail    string `json:"promotion_detail" xml:"promotion_detail"`
+	DeviceInfo         string `json:"device_info" xml:"device_info"`
+	Openid             string `json:"openid" xml:"openid"`
+	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe"`
+	SubOpenid          string `json:"sub_openid" xml:"sub_openid"`
+	SubIsSubscribe     string `json:"sub_is_subscribe" xml:"sub_is_subscribe"`
+	TradeType          string `json:"trade_type" xml:"trade_type"`
+	BankType           string `json:"bank_type" xml:"bank_type"`
+	TotalFee           string `json:"total_fee" xml:"total_fee"`
+	SettlementTotalFee string `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	FeeType            string `json:"fee_type" xml:"fee_type"`
+	CashFee            string `json:"cash_fee" xml:"cash_fee"`
+	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type"`
+	CouponFee          string `json:"coupon_fee" xml:"coupon_fee"`
+	CouponCount        string `json:"coupon_count" xml:"coupon_count"`
+	// todo 解析coupon
+	TransactionId string   `json:"transaction_id" xml:"transaction_id"`
+	OutTradeNo    string   `json:"out_trade_no" xml:"out_trade_no"`
+	Attach        string   `json:"attach" xml:"attach"`
+	TimeEnd       string   `json:"time_end" xml:"time_end"`
+	Version       string   `json:"version" xml:"version"`
+	RateValue     string   `json:"rate_value" xml:"rate_value"`
+	SignType      SignType `json:"sign_type" xml:"sign_type"`
+}
+
+type WxPayRefundNotifyResult struct {
+	BaseWxPayResult
+}
+
+// 提现请求对象
 type EntPayRequest struct {
 }
 
+// 提现响应对象
 type EntPayResult struct {
 }
 
+//
 type WxPaySandboxSignKeyResult struct {
 	BaseWxPayResult
 	SandboxSignkey string `json:"sandbox_signkey" xml:"sandbox_signkey"`
+}
+
+func (r *BaseWxPayResult) CheckResult(service WxPayService, signType SignType, checkSuccess bool) bool {
+	// todo 检测
+	return true
 }
