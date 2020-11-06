@@ -26,6 +26,21 @@ const (
 	MD5        SignType = "MD5"
 )
 
+type WxPayRequest interface {
+	CheckAndSign(c *WxPayConfig)
+	IsIgnoreAppId() bool
+	IsIgnoreSubAppId() bool
+	IsIgnoreSubMchId() bool
+	NeedNonceStr() bool
+
+	GetSignType() SignType
+}
+
+type WxPayResult interface {
+	CheckResult(service WxPayService, signType SignType, checkSuccess bool) error
+	Compose()
+}
+
 // 基础请求对象
 type BaseWxPayRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
@@ -116,45 +131,37 @@ func (r *BaseWxPayRequest) NeedNonceStr() bool {
 	return true
 }
 
-func (r *BaseWxPayResult) CheckResult(service WxPayService, signType SignType, checkSuccess bool) (string, bool) {
+func (r *BaseWxPayRequest) GetSignType() SignType {
+	return r.SignType
+}
+
+func (r *BaseWxPayResult) Error() string {
+	return fmt.Sprintf("返回代码：%s，返回信息：%s，结果代码：%s，结果信息：%s，错误代码：%s，错误详情：%s，错误信息：%s",
+		r.ReturnCode, r.ReturnMsg, r.ResultCode, r.RetMsg, r.ErrCode, r.ErrCodeDes, r.ErrMsg)
+}
+
+func (r *BaseWxPayResult) CheckResult(service WxPayService, signType SignType, checkSuccess bool) error {
 	data := r.ToMap()
 
 	if r.Sign != "" && r.Sign != service.Sign(data, signType) {
-		msg := fmt.Sprintf("校验结果签名失败，参数：%s", data)
-		return msg, false
+		return common.ErrorOf("校验结果签名失败，参数：%s", data)
 	}
 
 	if checkSuccess {
 		r1, r2 := TrimToUpper(r.ReturnCode), TrimToUpper(r.ResultCode)
 		if !(r1 == common.Success || r1 == "" || r2 == common.Success || r2 == "") {
-			var errorMsg string
-			if r1 != "" {
-				errorMsg += "返回代码：" + r1 + "\n"
-			}
-			if msg := TrimToUpper(r.ReturnMsg); msg != "" {
-				errorMsg += "返回信息：" + msg + "\n"
-			}
-			if r2 != "" {
-				errorMsg += "结果代码：" + r2 + "\n"
-			}
-			if msg := TrimToUpper(r.ErrCode); msg != "" {
-				errorMsg += "错误代码：" + msg + "\n"
-			}
-			if msg := TrimToUpper(r.ErrCodeDes); msg != "" {
-				errorMsg += "错误详情：" + msg + "\n"
-			}
-			if msg := TrimToUpper(r.ErrMsg); msg != "" {
-				errorMsg += "错误信息：" + msg + "\n"
-			}
-			return errorMsg, false
+			return r
 		}
 	}
 
-	return "", true
+	return nil
+}
+
+func (r *BaseWxPayResult) Compose() {
 }
 
 func (r *BaseWxPayResult) ToMap() map[string]interface{} {
-	return toMap(r)
+	return ToMap(r)
 }
 
 func TrimToUpper(str string) string {

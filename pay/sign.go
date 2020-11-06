@@ -27,7 +27,7 @@ func buildSignStr(request interface{}, sk string, ignoreParams ...string) string
 	var params map[string]interface{}
 	params, ok := request.(map[string]interface{})
 	if !ok {
-		params = toMap(request)
+		params = ToMap(request)
 	}
 	if params == nil {
 		return ""
@@ -66,7 +66,7 @@ func buildSignStr(request interface{}, sk string, ignoreParams ...string) string
 	return sign + "key=" + sk
 }
 
-func toMap(request interface{}) map[string]interface{} {
+func ToMap(request interface{}) map[string]interface{} {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return nil

@@ -3,7 +3,6 @@ package pay
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"github.com/cliod/wx-go/common"
 	"github.com/cliod/wx-go/common/util"
 	"io/ioutil"
@@ -14,14 +13,16 @@ import (
 )
 
 type WxPayService interface {
+	// 执行操作
+	Do(url string, request WxPayRequest, res WxPayResult, useKey bool) error
 	// 执行Post请求
-	Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error)
+	Post(url, contentType string, data interface{}, args ...interface{}) ([]byte, error)
 	// Post 执行Post请求并将结果转成对象
-	PostFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error
+	PostFor(v interface{}, url, contentType string, data interface{}, args ...interface{}) error
 	// Post 携带证书执行Post请求
 	PostKey(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error)
 	// Post 携带证书执行Post请求并将结果转成对象
-	PostKeyFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error
+	PostKeyFor(v interface{}, url, contentType string, data interface{}, args ...interface{}) error
 
 	// 获取微信支付请求url前缀，沙箱环境可能不一样.
 	GetPayBaseUr() string
@@ -106,7 +107,7 @@ type WxPayService interface {
 	GetEntPayService() WxEntPayService
 
 	// 获取沙河环境
-	GetSandboxSignKey(*BaseWxPayRequest) (*WxPaySandboxSignKeyResult, error)
+	GetSandboxSignKey(*WxPayDefaultRequest) (*WxPaySandboxSignKeyResult, error)
 
 	// 签名
 	Sign(params interface{}, st SignType, ignoreParams ...string) string
@@ -183,7 +184,7 @@ func (p *WxPayV2ServiceImpl) GetPayBaseUr() string {
 
 func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte, error) {
 	if request == nil {
-		return nil, fmt.Errorf("参数为空")
+		return nil, common.ErrorOf("参数为空")
 	}
 	v, err := p.UnifyOrder(request)
 	if err != nil {
@@ -191,15 +192,7 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 	}
 	prepayId := v.PrepayId
 	if prepayId == "" {
-		if v.ErrCode != "" {
-			return nil, fmt.Errorf("无法获取prepay id，错误代码： '%s'，信息：%s。", v.ErrCode, v.ErrCodeDes)
-		} else {
-			msg := v.ReturnMsg
-			if msg == "" {
-				msg = v.RetMsg
-			}
-			return nil, fmt.Errorf("无法获取prepay id，错误代码： '%s'，信息：%s。", v.ReturnCode, msg)
-		}
+		return nil, v
 	}
 
 	timestamp := strconv.Itoa(time.Now().Second())
@@ -252,24 +245,24 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 		configMap["sign"] = sign
 		return json.Marshal(configMap)
 	default:
-		return nil, fmt.Errorf("该交易类型暂不支持")
+		return nil, common.ErrorOf("该交易类型暂不支持")
 	}
 }
 
 func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxPayUnifiedOrderResult, error) {
 	if request == nil {
-		return nil, fmt.Errorf("参数为空")
+		return nil, common.ErrorOf("参数为空")
 	}
 
 	c := p.GetWxPayConfig()
 	if request.NotifyUrl == "" && c.NotifyUrl == "" {
-		return nil, fmt.Errorf("参数为空")
+		return nil, common.ErrorOf("参数为空")
 	}
 
-	p.cover(request)
-
 	if c.UseSandboxEnv {
-		re, err := p.GetSandboxSignKey(&request.BaseWxPayRequest)
+		re, err := p.GetSandboxSignKey(&WxPayDefaultRequest{
+			BaseWxPayRequest: request.BaseWxPayRequest,
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -281,20 +274,14 @@ func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxP
 	url := p.GetPayBaseUr() + common.PayUnifiedOrder
 
 	var res WxPayUnifiedOrderResult
-	err := p.PostFor(&res, url, common.PostXml, request)
-	//
-	//if err == nil {
-	//	msg, b := res.CheckResult(p, request.SignType, true)
-	//	if !b {
-	//		return nil, fmt.Errorf(msg)
-	//	}
-	//}
+	err := p.Do(url, request, &res, false)
+
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) CloseOrderBy(outTradeNo string) (*WxPayOrderCloseResult, error) {
 	if outTradeNo == "" {
-		return nil, fmt.Errorf("outTradeNo不能为空")
+		return nil, common.ErrorOf("outTradeNo不能为空")
 	}
 	return p.CloseOrder(&WxPayOrderCloseRequest{
 		OutTradeNo: outTradeNo,
@@ -303,21 +290,19 @@ func (p *WxPayV2ServiceImpl) CloseOrderBy(outTradeNo string) (*WxPayOrderCloseRe
 
 func (p *WxPayV2ServiceImpl) CloseOrder(request *WxPayOrderCloseRequest) (*WxPayOrderCloseResult, error) {
 	if request == nil || request.OutTradeNo == "" {
-		return nil, fmt.Errorf("outTradeNo不能为空")
+		return nil, common.ErrorOf("outTradeNo不能为空")
 	}
 
 	url := p.GetPayBaseUr() + common.PayCloseOrder
-
-	request.CheckAndSign(p.GetWxPayConfig())
-
 	var res WxPayOrderCloseResult
-	err := p.PostFor(&res, url, common.PostXml, request)
+
+	err := p.Do(url, request, &res, false)
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) QueryOrderBy(outTradeNo, transactionId string) (*WxPayOrderQueryResult, error) {
 	if outTradeNo != "" || transactionId != "" {
-		return nil, fmt.Errorf("参数为空")
+		return nil, common.ErrorOf("参数为空")
 	}
 	return p.QueryOrder(&WxPayOrderQueryRequest{
 		OutTradeNo:    outTradeNo,
@@ -326,59 +311,48 @@ func (p *WxPayV2ServiceImpl) QueryOrderBy(outTradeNo, transactionId string) (*Wx
 }
 
 func (p *WxPayV2ServiceImpl) QueryOrder(request *WxPayOrderQueryRequest) (*WxPayOrderQueryResult, error) {
-
 	url := p.GetPayBaseUr() + common.PayQueryOrder
 
-	request.Version = "1.0"
-
 	var res WxPayOrderQueryResult
-	err := p.PostFor(&res, url, common.PostXml, request)
+	err := p.Do(url, request, &res, false)
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) Refund(request *WxPayRefundRequest) (*WxPayRefundResult, error) {
 	url := p.GetPayBaseUr() + common.PayRefundUrl
 	if p.GetWxPayConfig().UseSandboxEnv {
-		url = p.GetPayBaseUr() + common.PayRefundSandboxUrl
+		url = p.GetWxPayConfig().PayBaseUrl + common.PayRefundSandboxUrl
 	}
 
-	request.CheckAndSign(p.GetWxPayConfig())
-
 	var res WxPayRefundResult
-	err := p.PostKeyFor(&res, url, common.PostXml, request)
+	err := p.Do(url, request, &res, true)
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) RefundV2(request *WxPayRefundRequest) (*WxPayRefundResult, error) {
 	url := p.GetPayBaseUr() + common.PayRefundUrlV2
 	if p.GetWxPayConfig().UseSandboxEnv {
-		url = p.GetPayBaseUr() + common.PayRefundSandboxUrlV2
+		url = p.GetWxPayConfig().PayBaseUrl + common.PayRefundSandboxUrlV2
 	}
 
-	request.CheckAndSign(p.GetWxPayConfig())
-
 	var res WxPayRefundResult
-	err := p.PostKeyFor(&res, url, common.PostXml, request)
+	err := p.Do(url, request, &res, true)
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) RefundQuery(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error) {
 	url := p.GetPayBaseUr() + common.PayQueryRefundUrl
 
-	request.CheckAndSign(p.GetWxPayConfig())
-
 	var res WxPayRefundQueryResult
-	err := p.PostFor(&res, url, common.PostXml, request)
+	err := p.Do(url, request, &res, false)
 	return &res, err
 }
 
 func (p *WxPayV2ServiceImpl) RefundQueryV2(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error) {
 	url := p.GetPayBaseUr() + common.PayQueryRefundUrlV2
 
-	request.CheckAndSign(p.GetWxPayConfig())
-
 	var res WxPayRefundQueryResult
-	err := p.PostFor(&res, url, common.PostXml, request)
+	err := p.Do(url, request, &res, false)
 	return &res, err
 }
 
@@ -412,19 +386,10 @@ func (p *WxPayV2ServiceImpl) GetEntPayService() WxEntPayService {
 	return p.entPayService
 }
 
-func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *BaseWxPayRequest) (*WxPaySandboxSignKeyResult, error) {
+func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *WxPayDefaultRequest) (*WxPaySandboxSignKeyResult, error) {
 	url := common.PayGetSandboxSignKey
-
 	var res WxPaySandboxSignKeyResult
-	//request.Sign = p.Sign(request)
-	//err := p.PostFor(&res, url, "", request)
-	data := map[string]interface{}{
-		"mch_id":    request.MchId,
-		"nonce_str": request.NonceStr,
-	}
-	data["sign"] = p.Sign(data, request.SignType)
-	err := p.PostFor(&res, url, "", data)
-
+	err := p.Do(url, request, &res, false)
 	return &res, err
 }
 
@@ -438,28 +403,27 @@ func (p *WxPayV2ServiceImpl) Sign(params interface{}, st SignType, ignoreParams 
 	return strings.ToUpper(sign)
 }
 
+// 操作
+func (p *WxPayV2ServiceImpl) Do(url string, request WxPayRequest, res WxPayResult, useKey bool) error {
+	request.CheckAndSign(p.GetWxPayConfig())
+
+	var err error
+	if useKey {
+		err = p.PostKeyFor(&res, url, common.PostXml, request)
+	} else {
+		err = p.PostFor(&res, url, common.PostXml, request)
+	}
+
+	if err == nil {
+		err = res.CheckResult(p, request.GetSignType(), true)
+	}
+	return err
+}
+
 // 微信支付签名算法(详见:https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=4_3).
 func (p *WxPayV2ServiceImpl) sign(params interface{}, ignoreParams ...string) string {
 	st := p.GetWxPayConfig().SignType
 	return p.Sign(params, st, ignoreParams...)
-}
-
-func (p *WxPayV2ServiceImpl) cover(request *WxPayUnifiedOrderRequest) {
-
-	c := p.GetWxPayConfig()
-
-	request.CheckAndSign(p.GetWxPayConfig())
-
-	if request.NotifyUrl == "" {
-		request.NotifyUrl = c.NotifyUrl
-	}
-	if request.SpbillCreateIp == "" {
-		request.SpbillCreateIp = "127.0.0.1"
-	}
-	if request.TradeType == "" {
-		request.TradeType = JSAPI
-	}
-
 }
 
 func NewWxPayService(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {

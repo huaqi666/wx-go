@@ -2,6 +2,15 @@ package pay
 
 import "encoding/xml"
 
+// 默认参数，与基础参数一致
+type WxPayDefaultRequest struct {
+	BaseWxPayRequest
+}
+
+func (r *WxPayDefaultRequest) IsIgnoreAppId() bool {
+	return true
+}
+
 // 统一下单请求对象
 type WxPayUnifiedOrderRequest struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
@@ -70,6 +79,21 @@ type WxPayUnifiedOrderRequest struct {
 	SceneInfo     string    `json:"scene_info,omitempty" xml:"scene_info,omitempty"`
 	Fingerprint   string    `json:"fingerprint,omitempty" xml:"fingerprint,omitempty"`
 	ProfitSharing string    `json:"profit_sharing,omitempty" xml:"profit_sharing,omitempty"`
+}
+
+func (r *WxPayUnifiedOrderRequest) CheckAndSign(c *WxPayConfig) {
+
+	r.BaseWxPayRequest.CheckAndSign(c)
+
+	if r.NotifyUrl == "" {
+		r.NotifyUrl = c.NotifyUrl
+	}
+	if r.SpbillCreateIp == "" {
+		r.SpbillCreateIp = "127.0.0.1"
+	}
+	if r.TradeType == "" {
+		r.TradeType = JSAPI
+	}
 }
 
 // 统一下单响应对象
@@ -166,11 +190,20 @@ type WxPayRefundRequest struct {
 	// 选填 ...
 	DeviceInfo    string `json:"device_info,omitempty" xml:"device_info,omitempty"`
 	RefundFeeType string `json:"refund_fee_type,omitempty" xml:"refund_fee_type,omitempty"`
+	// 操作员帐号, 默认为商户号
 	OpUserId      string `json:"op_user_id,omitempty" xml:"op_user_id,omitempty"`
 	RefundAccount string `json:"refund_account,omitempty" xml:"refund_account,omitempty"`
 	RefundDesc    string `json:"refund_desc,omitempty" xml:"refund_desc,omitempty"`
 	NotifyUrl     string `json:"notify_url,omitempty" xml:"notify_url,omitempty"`
 	Detail        string `json:"detail,omitempty" xml:"detail,omitempty"`
+}
+
+func (r *WxPayRefundRequest) CheckAndSign(c *WxPayConfig) {
+	r.BaseWxPayRequest.CheckAndSign(c)
+
+	if r.OpUserId == "" {
+		r.OpUserId = c.MchId
+	}
 }
 
 // 退款响应对象
