@@ -10,6 +10,18 @@ import (
 
 var Ignores = []string{"sign", "key", "xmlString", "xmlDoc", "couponList"}
 
+func SignFor(params interface{}, st SignType, sk string, ignoreParams ...string) string {
+	signStr := buildSignStr(params, sk, ignoreParams...)
+	var sign string
+	switch st {
+	case HmacSha256:
+		sign = util.HmacSha256(signStr, sk)
+	case MD5:
+		sign = util.Md5(signStr)
+	}
+	return sign
+}
+
 func buildSignStr(request interface{}, sk string, ignoreParams ...string) string {
 
 	var params map[string]interface{}
@@ -65,32 +77,4 @@ func toMap(request interface{}) map[string]interface{} {
 		return nil
 	}
 	return data
-}
-
-func SignForMap(params map[string]interface{}, st SignType, sk string, ignoreParams ...string) string {
-	signStr := buildSign(params, sk, ignoreParams...)
-	var sign string
-	switch st {
-	case HmacSha256:
-		sign = util.HmacSha256(signStr, sk)
-	case MD5:
-		sign = util.Md5(signStr)
-	}
-	return sign
-}
-
-func SignForObj(params interface{}, st SignType, sk string, ignoreParams ...string) string {
-	p, ok := params.(map[string]interface{})
-	if ok {
-		return SignForMap(p, st, sk, ignoreParams...)
-	}
-	signStr := buildSignFor(params, sk, ignoreParams...)
-	var sign string
-	switch st {
-	case HmacSha256:
-		sign = util.HmacSha256(signStr, sk)
-	case MD5:
-		sign = util.Md5(signStr)
-	}
-	return sign
 }
