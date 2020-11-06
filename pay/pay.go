@@ -181,7 +181,7 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 			"noncestr":  nonceStr,
 			"appid":     appId,
 		}
-		sign := p.signForMap(configMap, request.SignType, p.GetWxPayConfig().MchKey)
+		sign := p.sign(configMap, request.SignType, p.GetWxPayConfig().MchKey)
 		configMap["sign"] = sign
 		return json.Marshal(configMap)
 	case JSAPI:
@@ -200,7 +200,7 @@ func (p *WxPayV2ServiceImpl) UnifyPay(request *WxPayUnifiedOrderRequest) ([]byte
 			"appid":     appId,
 			"sign_type": string(st),
 		}
-		sign := p.signForMap(configMap, request.SignType, p.GetWxPayConfig().MchKey)
+		sign := p.sign(configMap, request.SignType, p.GetWxPayConfig().MchKey)
 		configMap["sign"] = sign
 		return json.Marshal(configMap)
 	default:
@@ -227,7 +227,7 @@ func (p *WxPayV2ServiceImpl) UnifyOrder(request *WxPayUnifiedOrderRequest) (*WxP
 		}
 		request.Sign = re.SandboxSignkey
 	} else {
-		request.Sign = p.signForObj(request, c.SignType, c.MchKey)
+		request.Sign = p.sign(request, c.SignType, c.MchKey)
 	}
 
 	url := p.GetPayBaseUr() + "/pay/unifiedorder"
@@ -254,7 +254,7 @@ func (p *WxPayV2ServiceImpl) CloseOrder(request *WxPayOrderCloseRequest) (*WxPay
 
 	url := p.GetPayBaseUr() + "/pay/closeorder"
 
-	request.Sign = p.signForObj(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
+	request.Sign = p.sign(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
 
 	var res WxPayOrderCloseResult
 	err := p.PostFor(&res, url, "", request)
@@ -275,7 +275,7 @@ func (p *WxPayV2ServiceImpl) QueryOrder(request *WxPayOrderQueryRequest) (*WxPay
 
 	url := p.GetPayBaseUr() + "/pay/orderquery"
 
-	request.Sign = p.signForObj(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
+	request.Sign = p.sign(request, p.GetWxPayConfig().SignType, p.GetWxPayConfig().MchKey)
 	request.Version = "1.0"
 
 	var res WxPayOrderQueryResult
@@ -305,28 +305,15 @@ func (p *WxPayV2ServiceImpl) GetSandboxSignKey(request *BaseWxPayRequest) (*WxPa
 		"mch_id":    request.MchId,
 		"nonce_str": request.NonceStr,
 	}
-	data["sign"] = p.signForMap(data, request.SignType, p.GetWxPayConfig().MchKey)
+	data["sign"] = p.sign(data, request.SignType, p.GetWxPayConfig().MchKey)
 	err := p.PostFor(&res, url, "", data)
 
 	return &res, err
 }
 
 // 微信支付签名算法(详见:https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=4_3).
-func (p *WxPayV2ServiceImpl) signForMap(params map[string]interface{}, st SignType, sk string, ignoreParams ...string) string {
-	signStr := buildSign(params, sk, ignoreParams...)
-	var sign string
-	switch st {
-	case HmacSha256:
-		sign = util.HmacSha256(signStr, sk)
-	case MD5:
-		sign = util.Md5(signStr)
-	}
-	return strings.ToUpper(sign)
-}
-
-// 微信支付签名算法(详见:https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=4_3).
-func (p *WxPayV2ServiceImpl) signForObj(params interface{}, st SignType, sk string, ignoreParams ...string) string {
-	signStr := buildSignFor(params, sk, ignoreParams...)
+func (p *WxPayV2ServiceImpl) sign(params interface{}, st SignType, sk string, ignoreParams ...string) string {
+	signStr := buildSignStr(params, sk, ignoreParams...)
 	var sign string
 	switch st {
 	case HmacSha256:

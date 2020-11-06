@@ -9,7 +9,17 @@ import (
 
 var Ignores = []string{"sign", "key", "xmlString", "xmlDoc", "couponList"}
 
-func buildSign(params map[string]interface{}, sk string, ignoreParams ...string) string {
+func buildSignStr(request interface{}, sk string, ignoreParams ...string) string {
+
+	var params map[string]interface{}
+	params, ok := request.(map[string]interface{})
+	if !ok {
+		params = toMap(request)
+	}
+	if params == nil {
+		return ""
+	}
+
 	var arr []string
 	for k := range params {
 		arr = append(arr, k)
@@ -43,15 +53,15 @@ func buildSign(params map[string]interface{}, sk string, ignoreParams ...string)
 	return sign + "key=" + sk
 }
 
-func buildSignFor(request interface{}, sk string, ignoreParams ...string) string {
+func toMap(request interface{}) map[string]interface{} {
 	b, err := json.Marshal(request)
 	if err != nil {
-		return ""
+		return nil
 	}
 	var data map[string]interface{}
 	err = json.Unmarshal(b, &data)
 	if err != nil {
-		return ""
+		return nil
 	}
-	return buildSign(data, sk, ignoreParams...)
+	return data
 }
