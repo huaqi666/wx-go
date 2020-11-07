@@ -18,12 +18,21 @@ func CheckSignature(token, timestamp, nonce, signature string) bool {
 	return gen == signature
 }
 
+// 解密分享敏感数据.
+func GetShareInfo(sessionKey, encryptedData, ivStr string) (*WxMaShareInfo, error) {
+	var usrInfo WxMaShareInfo
+	err := util.Decrypt(&usrInfo, sessionKey, encryptedData, ivStr)
+	return &usrInfo, err
+}
+
+// 解密用户信息敏感数据.
 func GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error) {
 	var usrInfo UserInfo
 	err := util.Decrypt(&usrInfo, sessionKey, encryptedData, ivStr)
 	return &usrInfo, err
 }
 
+// 解密手机号敏感数据.
 func GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
 	var info PhoneNumberInfo
 	err := util.Decrypt(&info, sessionKey, encryptedData, ivStr)

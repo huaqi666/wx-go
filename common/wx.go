@@ -2,6 +2,7 @@ package common
 
 import (
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -51,19 +52,33 @@ type WxServiceImpl struct {
 }
 
 func (s *WxServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
-	return s.http.Get(url, args...)
+	return s.http.Get(url, s.attachAccessToken(url, args)...)
 }
 
 func (s *WxServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
-	return s.http.Post(url, contentType, data, args...)
+	return s.http.Post(url, contentType, data, s.attachAccessToken(url, args)...)
 }
 
 func (s *WxServiceImpl) GetFor(v interface{}, url string, args ...interface{}) error {
-	return s.http.GetFor(v, url, args...)
+	return s.http.GetFor(v, url, s.attachAccessToken(url, args)...)
 }
 
 func (s *WxServiceImpl) PostFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error {
-	return s.http.PostFor(v, url, contentType, data, args...)
+	return s.http.PostFor(v, url, contentType, data, s.attachAccessToken(url, args)...)
+}
+
+func (s *WxServiceImpl) attachAccessToken(url string, args []interface{}) []interface{} {
+	var params []interface{}
+	if strings.Contains(url, ApiSuffix) {
+		accessToken := ""
+		at, err := s.GetAccessToken()
+		if err == nil {
+			accessToken = at.AccessToken
+		}
+		params = append(params, accessToken)
+	}
+	params = append(params, args...)
+	return params
 }
 
 func (s *WxServiceImpl) getAccessToken() (*AccessToken, error) {

@@ -30,5 +30,4 @@ func TestAll(t *testing.T) {
 	mpTest(c.Mp)
 
 	payTest(c.Pay)
-
 }

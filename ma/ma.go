@@ -6,8 +6,6 @@ import (
 
 type WxMaService interface {
 	common.WxService
-	// 携带access_token执行
-	Do(url string, res error) error
 	// 获取配置
 	GetWxMaConfig() WxMaConfig
 	// 设置配置
@@ -31,10 +29,18 @@ type WxMaService interface {
 	GetWxMaQrcodeService() WxMaQrcodeService
 	// 获取订阅接口
 	GetWxMaSubscribeService() WxMaSubscribeService
+	// 获取分享接口
+	GetWxMaShareService() WxMaShareService
+	// 获取消息接口
+	GetWxMaMessageService() WxMaMsgService
 	// 设置(用户自定义的)二维码接口
 	SetWxMaQrcodeService(qrcodeService WxMaQrcodeService)
 	// 设置(用户自定义的)订阅接口
 	SetWxMaSubscribeService(subscribeService WxMaSubscribeService)
+	// 设置(用户自定义的)分享接口
+	SetWxMaShareService(shareService WxMaShareService)
+	// 设置(用户自定义的)消息接口
+	SetWxMaMsgService(msgService WxMaMsgService)
 }
 
 type WxMaServiceImpl struct {
@@ -44,16 +50,19 @@ type WxMaServiceImpl struct {
 	userService      WxMaUserService
 	qrCodeService    WxMaQrcodeService
 	subscribeService WxMaSubscribeService
+	shareService     WxMaShareService
+	msgService       WxMaMsgService
 }
 
 func newWxMaService(config WxMaConfig) *WxMaServiceImpl {
-	impl := WxMaServiceImpl{}
+	impl := &WxMaServiceImpl{}
 	impl.SetHttpService(common.NewService())
 	impl.SetWxMaConfig(config)
-	impl.userService = newWxMaUserService(&impl)
-	impl.qrCodeService = newWxMaQrcodeService(&impl)
-	impl.subscribeService = newWxMaSubscribeService(&impl)
-	return &impl
+	impl.userService = newWxMaUserService(impl)
+	impl.qrCodeService = newWxMaQrcodeService(impl)
+	impl.subscribeService = newWxMaSubscribeService(impl)
+	impl.msgService = newWxMaMsgService(impl)
+	return impl
 }
 
 func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error) {
@@ -84,7 +93,7 @@ func (s *WxMaServiceImpl) GetPaidUnionId(openid, transactionId, mchId, outTradeN
 		url += "&" + k + "=" + v
 	}
 	var res WxMaUnionIdResult
-	return &res, s.Do(url, &res)
+	return &res, s.GetFor(&res, url)
 }
 
 func (s *WxMaServiceImpl) GetWxMaUserService() WxMaUserService {
@@ -99,6 +108,14 @@ func (s *WxMaServiceImpl) GetWxMaSubscribeService() WxMaSubscribeService {
 	return s.subscribeService
 }
 
+func (s *WxMaServiceImpl) GetWxMaShareService() WxMaShareService {
+	return s.shareService
+}
+
+func (s *WxMaServiceImpl) GetWxMaMessageService() WxMaMsgService {
+	return s.msgService
+}
+
 func (s *WxMaServiceImpl) SetWxMaUserService(userService WxMaUserService) {
 	s.userService = userService
 }
@@ -111,6 +128,14 @@ func (s *WxMaServiceImpl) SetWxMaSubscribeService(subscribeService WxMaSubscribe
 	s.subscribeService = subscribeService
 }
 
+func (s *WxMaServiceImpl) SetWxMaShareService(shareService WxMaShareService) {
+	s.shareService = shareService
+}
+
+func (s *WxMaServiceImpl) SetWxMaMsgService(msgService WxMaMsgService) {
+	s.msgService = msgService
+}
+
 func (s *WxMaServiceImpl) GetWxMaConfig() WxMaConfig {
 	return s.config
 }
@@ -119,14 +144,6 @@ func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
 	s.SetWxConfig(config)
 	s.config = config
 	_, _ = s.ForceGetAccessToken(true)
-}
-
-func (s *WxMaServiceImpl) Do(url string, res error) (err error) {
-	at, err := s.GetAccessToken()
-	if err == nil {
-		err = s.GetFor(&res, url, at.AccessToken)
-	}
-	return
 }
 
 func NewWxMaService(appId, secret string) WxMaService {

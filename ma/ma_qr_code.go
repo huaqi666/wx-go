@@ -52,11 +52,7 @@ func newWxMaQrcodeService(service WxMaService) *WxMaQrCodeServiceImpl {
 func (q *WxMaQrCodeServiceImpl) CreateQrcodeBytes(path string, width int) (bytes []byte, err error) {
 
 	data := map[string]interface{}{"path": path, "width": width}
-	at, err := q.service.GetAccessToken()
-	if err != nil {
-		return
-	}
-	bytes, err = q.service.Post(common.MaQrcodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrcodeUrl, "", data)
 	return
 }
 
@@ -76,11 +72,7 @@ func (q *WxMaQrCodeServiceImpl) CreateWxaCodeBytes(path string, width int, autoC
 			IsHyaline: isTransparent,
 		},
 	}
-	at, err := q.service.GetAccessToken()
-	if err != nil {
-		return
-	}
-	bytes, err = q.service.Post(common.MaQrWxaCodeUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrWxaCodeUrl, "", data)
 	return
 }
 
@@ -102,11 +94,7 @@ func (q *WxMaQrCodeServiceImpl) CreateWxaCodeUnlimitedBytes(scene, path string, 
 			IsHyaline: isTransparent,
 		},
 	}
-	at, err := q.service.GetAccessToken()
-	if err != nil {
-		return
-	}
-	bytes, err = q.service.Post(common.MaQrCodeUnlimitedUrl, "", data, at.AccessToken)
+	bytes, err = q.service.Post(common.MaQrCodeUnlimitedUrl, "", data)
 	return
 }
 

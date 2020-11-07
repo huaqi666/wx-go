@@ -50,12 +50,12 @@ type WxMpServiceImpl struct {
 }
 
 func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
-	impl := WxMpServiceImpl{}
+	impl := &WxMpServiceImpl{}
 	impl.SetHttpService(common.NewService())
 	impl.SetWxMpConfig(config)
-	impl.userService = newWxMpUserService(&impl)
-	impl.qrcodeService = newWxMpQrcodeService(&impl)
-	return &impl
+	impl.userService = newWxMpUserService(impl)
+	impl.qrcodeService = newWxMpQrcodeService(impl)
+	return impl
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
@@ -85,14 +85,9 @@ func (s *WxMpServiceImpl) ForceGetTicket(ticketType TicketType, forceRefresh boo
 }
 
 func (s *WxMpServiceImpl) getTicket(ticketType TicketType) (*Ticket, error) {
-	at, err := s.GetAccessToken()
-	if err != nil {
-		return nil, err
-	}
-
 	var ticket Ticket
 
-	err = s.GetFor(&ticket, common.MpGetTicketUrl, at.AccessToken, ticketType)
+	err := s.GetFor(&ticket, common.MpGetTicketUrl, ticketType)
 	return &ticket, err
 }
 

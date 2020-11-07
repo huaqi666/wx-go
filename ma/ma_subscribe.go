@@ -7,8 +7,6 @@ import (
 )
 
 type WxMaSubscribeService interface {
-	// 携带access_token执行
-	Do(url string, res error) error
 	/* 获取帐号所属类目下的公共模板标题
 	   详情请见: https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.getPubTemplateTitleList.html */
 	GetPubTemplateTitleList(ids []string, start, limit int) (*WxMaPubTemplateTitleListResult, error)
@@ -27,6 +25,9 @@ type WxMaSubscribeService interface {
 	/* 获取小程序账号的类目
 	   详情请见: https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.getCategory.html */
 	GetCategory() (*WxMaCategoryListResult, error)
+	/* 发送订阅消息
+	   详情请见: https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html */
+	SendMsg(msg *WxMaSubscribeMessage)
 }
 
 type WxMaSubscribeServiceImpl struct {
@@ -50,7 +51,7 @@ func (i *WxMaSubscribeServiceImpl) GetPubTemplateTitleList(ids []string, start, 
 	}
 
 	var res WxMaPubTemplateTitleListResult
-	err := i.Do(url, &res)
+	err := i.service.GetFor(&res, url)
 	return &res, err
 }
 
@@ -58,13 +59,13 @@ func (i *WxMaSubscribeServiceImpl) GetPubTemplateKeyWordsById(id string) (*WxMaP
 	url := common.MaGetPubTemplateKeyWordsByIdUrl + "&tid=" + id
 
 	var res WxMaPubTemplateKeywordListResult
-	err := i.Do(url, &res)
+	err := i.service.GetFor(&res, url)
 	return &res, err
 }
 
 func (i *WxMaSubscribeServiceImpl) GetTemplateList() (*WxMaTemplateListResult, error) {
 	var res WxMaTemplateListResult
-	err := i.Do(common.MaTemplateListUrl, &res)
+	err := i.service.GetFor(&res, common.MaTemplateListUrl)
 	return &res, err
 }
 
@@ -77,13 +78,8 @@ func (i *WxMaSubscribeServiceImpl) AddTemplate(id, sceneDesc string, keywordIds 
 		"sceneDesc": sceneDesc,
 	}
 
-	at, err := i.service.GetAccessToken()
-	if err != nil {
-		return nil, err
-	}
-
 	var res WxMaAddTemplateResult
-	err = i.service.PostFor(&res, url, common.PostJsonContentType, param, at.AccessToken)
+	err := i.service.PostFor(&res, url, common.PostJsonContentType, param)
 	return &res, err
 }
 
@@ -94,13 +90,8 @@ func (i *WxMaSubscribeServiceImpl) DelTemplate(templateId string) error {
 		"priTmplId": templateId,
 	}
 
-	at, err := i.service.GetAccessToken()
-	if err != nil {
-		return err
-	}
-
 	var res common.Err
-	err = i.service.PostFor(&res, url, common.PostJsonContentType, param, at.AccessToken)
+	err := i.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err
 	}
@@ -109,10 +100,10 @@ func (i *WxMaSubscribeServiceImpl) DelTemplate(templateId string) error {
 
 func (i *WxMaSubscribeServiceImpl) GetCategory() (*WxMaCategoryListResult, error) {
 	var res WxMaCategoryListResult
-	err := i.Do(common.MaGetCategoryUrl, &res)
+	err := i.service.GetFor(&res, common.MaGetCategoryUrl)
 	return &res, err
 }
 
-func (i *WxMaSubscribeServiceImpl) Do(url string, res error) error {
-	return i.service.Do(url, res)
+func (i *WxMaSubscribeServiceImpl) SendMsg(msg *WxMaSubscribeMessage) {
+	i.service.GetWxMaMessageService().SendSubscribeMsg(msg)
 }

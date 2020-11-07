@@ -31,6 +31,12 @@ const (
 	MaGetCategoryUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/getcategory" + ApiSuffix
 	MaTemplateDelUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/deltemplate" + ApiSuffix
 	MaTemplateAddUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/addtemplate" + ApiSuffix
+
+	MaSubscribeMsgSendUrl = ApiDefaultHostUrl + "/cgi-bin/message/subscribe/send" + ApiSuffix
+	MaUniformMsgSendUrl   = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/template/uniform_send" + ApiSuffix
+	MaKefuMessageSendUrl  = ApiDefaultHostUrl + "/cgi-bin/message/custom/send" + ApiSuffix
+	MaUpdatableMsgSendUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/updatablemsg/send" + ApiSuffix
+	MaActivityIdCreateUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/activityid/create" + ApiSuffix
 )
 
 // mp
