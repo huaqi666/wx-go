@@ -8,7 +8,7 @@
 #### 支持包括微信支付、公众号、小程序等微信功能的后端开发。
 
 ### 使用方式
-注意：最新版本（包括测试版）为 [![GitHub release](https://img.shields.io/github/release/cliod/cliod.svg)](https://github.com/cliod/wx-go/releases)
+注意：最新版本（包括测试版）为 [![GitHub release](https://img.shields.io/badge/github-releases-blue)](https://github.com/cliod/wx-go/releases)
 
 ```shell script
 go get -u github.com/cliod/wx-go
