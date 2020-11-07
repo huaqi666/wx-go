@@ -52,6 +52,7 @@ type WxMaServiceImpl struct {
 	subscribeService WxMaSubscribeService
 	shareService     WxMaShareService
 	msgService       WxMaMsgService
+	liveService      WxMaLiveService
 }
 
 func newWxMaService(config WxMaConfig) *WxMaServiceImpl {
@@ -62,6 +63,8 @@ func newWxMaService(config WxMaConfig) *WxMaServiceImpl {
 	impl.qrCodeService = newWxMaQrcodeService(impl)
 	impl.subscribeService = newWxMaSubscribeService(impl)
 	impl.msgService = newWxMaMsgService(impl)
+	impl.shareService = newWxMaShareService(impl)
+	impl.liveService = newWxMaLiveService(impl)
 	return impl
 }
 
@@ -146,11 +149,11 @@ func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
 	_, _ = s.ForceGetAccessToken(true)
 }
 
-func NewWxMaService(appId, secret string) WxMaService {
+func NewWxMaServiceBy(appId, secret string) WxMaService {
 	return newWxMaService(newWxMaConfig(appId, secret))
 }
 
-func NewWxMaServiceBy(config WxMaConfig) WxMaService {
+func NewWxMaService(config WxMaConfig) WxMaService {
 	if config == nil {
 		config = new(WxMaConfigImpl)
 	}

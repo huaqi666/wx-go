@@ -2,7 +2,6 @@ package pay
 
 import (
 	"github.com/cliod/wx-go/common"
-	"github.com/cliod/wx-go/common/util"
 )
 
 type WxPayConfig struct {
@@ -42,28 +41,9 @@ type WxPayConfig struct {
 
 func (c *WxPayConfig) GetPayBaseUrl() string {
 	if c.PayBaseUrl == "" {
-		return common.PayDefaultPayBaseUrl
+		c.PayBaseUrl = common.PayDefaultPayBaseUrl
 	}
 	return c.PayBaseUrl
-}
-
-func (c *WxPayConfig) CheckConfig(request *BaseWxPayRequest) {
-	if request.AppId == "" {
-		request.AppId = c.AppId
-	}
-	if request.SignType == "" {
-		request.SignType = c.SignType
-	}
-	if request.MchId == "" {
-		request.MchId = c.MchId
-	}
-	if request.SubAppId == "" {
-		request.SubAppId = c.SubAppId
-	}
-	if request.SubMchId == "" {
-		request.SubMchId = c.SubMchId
-	}
-	request.NonceStr = util.RandSeq(32)
 }
 
 func NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConfig {

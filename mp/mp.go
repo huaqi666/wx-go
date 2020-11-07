@@ -123,11 +123,11 @@ func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
 	_, _ = s.ForceGetAccessToken(true)
 }
 
-func NewWxMpService(appId, secret string) WxMpService {
+func NewWxMpServiceBy(appId, secret string) WxMpService {
 	return newWxMpService(newWxMpConfig(appId, secret))
 }
 
-func NewWxMpServiceBy(config WxMpConfig) WxMpService {
+func NewWxMpService(config WxMpConfig) WxMpService {
 	if config == nil {
 		config = new(WxMpConfigImpl)
 	}

@@ -37,6 +37,10 @@ const (
 	MaKefuMessageSendUrl  = ApiDefaultHostUrl + "/cgi-bin/message/custom/send" + ApiSuffix
 	MaUpdatableMsgSendUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/updatablemsg/send" + ApiSuffix
 	MaActivityIdCreateUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/activityid/create" + ApiSuffix
+
+	MaCreateRoom  = ApiDefaultHostUrl + "/wxaapi/broadcast/room/create" + ApiSuffix
+	MaGetLiveInfo = ApiDefaultHostUrl + "/wxa/business/getliveinfo" + ApiSuffix
+	MaAddGoods    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/addgoods" + ApiSuffix
 )
 
 // mp

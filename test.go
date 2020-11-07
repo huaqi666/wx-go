@@ -12,7 +12,7 @@ import (
 )
 
 func maTest(c Config) {
-	service := ma.NewWxMaService(c.AppId, c.Secret)
+	service := ma.NewWxMaServiceBy(c.AppId, c.Secret)
 
 	qc := service.GetWxMaQrcodeService()
 
@@ -42,7 +42,7 @@ func maTest(c Config) {
 }
 
 func mpTest(c Config) {
-	service := mp.NewWxMpService(c.AppId, c.Secret)
+	service := mp.NewWxMpServiceBy(c.AppId, c.Secret)
 
 	da, err := service.CreateJsapiSignature("https://www.baidu.com")
 	if err == nil {
@@ -89,7 +89,7 @@ func payTest(c Config) {
 
 	conf := pay.NewBaseV2Config(c.AppId, c.MchId, c.MchKey, "https://www.baidu.com/notify", "")
 	//conf.UseSandboxEnv = true
-	service := pay.NewWxPayServiceFor(conf)
+	service := pay.NewWxPayService(conf)
 
 	s := strconv.Itoa(time.Now().Nanosecond()) + strconv.Itoa(rand.Intn(999999))
 

@@ -181,10 +181,7 @@ func (p *WxPayV2ServiceImpl) PostKeyFor(v interface{}, url, contentType string, 
 }
 
 func (p *WxPayV2ServiceImpl) GetPayBaseUr() string {
-	url := p.GetWxPayConfig().PayBaseUrl
-	if url == "" {
-		url = common.PayDefaultPayBaseUrl
-	}
+	url := p.GetWxPayConfig().GetPayBaseUrl()
 	if p.GetWxPayConfig().UseSandboxEnv {
 		url += "/sandboxnew"
 	}
@@ -330,7 +327,7 @@ func (p *WxPayV2ServiceImpl) QueryOrder(request *WxPayOrderQueryRequest) (*WxPay
 func (p *WxPayV2ServiceImpl) Refund(request *WxPayRefundRequest) (*WxPayRefundResult, error) {
 	url := p.GetPayBaseUr() + common.PayRefundUrl
 	if p.GetWxPayConfig().UseSandboxEnv {
-		url = p.GetWxPayConfig().PayBaseUrl + common.PayRefundSandboxUrl
+		url = p.GetWxPayConfig().GetPayBaseUrl() + common.PayRefundSandboxUrl
 	}
 
 	var res WxPayRefundResult
@@ -341,7 +338,7 @@ func (p *WxPayV2ServiceImpl) Refund(request *WxPayRefundRequest) (*WxPayRefundRe
 func (p *WxPayV2ServiceImpl) RefundV2(request *WxPayRefundRequest) (*WxPayRefundResult, error) {
 	url := p.GetPayBaseUr() + common.PayRefundUrlV2
 	if p.GetWxPayConfig().UseSandboxEnv {
-		url = p.GetWxPayConfig().PayBaseUrl + common.PayRefundSandboxUrlV2
+		url = p.GetWxPayConfig().GetPayBaseUrl() + common.PayRefundSandboxUrlV2
 	}
 
 	var res WxPayRefundResult
@@ -463,10 +460,13 @@ func (p *WxPayV2ServiceImpl) sign(params interface{}, ignoreParams ...string) st
 	return p.Sign(params, st, ignoreParams...)
 }
 
-func NewWxPayService(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {
+func NewWxPayServiceBy(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {
 	return newWxPayService(NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath))
 }
 
-func NewWxPayServiceFor(config *WxPayConfig) WxPayService {
+func NewWxPayService(config *WxPayConfig) WxPayService {
+	if config == nil {
+		config = new(WxPayConfig)
+	}
 	return newWxPayService(config)
 }
