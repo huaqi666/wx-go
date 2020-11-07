@@ -39,3 +39,19 @@ type WxPayRefundRecord struct {
 	RefundRecvAccount   string               `json:"refund_recv_account"`
 	RefundSuccessTime   string               `json:"refund_success_time"`
 }
+
+type ReqInfo struct {
+	TransactionId       string `json:"transaction_id" xml:"transaction_id"`
+	OutTradeNo          string `json:"out_trade_no" xml:"out_trade_no"`
+	RefundId            string `json:"refund_id" xml:"refund_id"`
+	OutRefundNo         string `json:"out_refund_no" xml:"out_refund_no"`
+	TotalFee            uint64 `json:"total_fee" xml:"total_fee"`
+	SettlementTotalFee  uint64 `json:"settlement_total_fee" xml:"settlement_total_fee"`
+	RefundFee           uint64 `json:"refund_fee" xml:"refund_fee"`
+	SettlementRefundFee uint64 `json:"settlement_refund_fee" xml:"settlement_refund_fee"`
+	RefundStatus        string `json:"refund_status" xml:"refund_status"`
+	SuccessTime         string `json:"success_time" xml:"success_time"`
+	RefundRecvAccout    string `json:"refund_recv_accout" xml:"refund_recv_accout"`
+	RefundAccount       string `json:"refund_account" xml:"refund_account"`
+	RefundRequestSource string `json:"refund_request_source" xml:"refund_request_source"`
+}

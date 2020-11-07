@@ -3,12 +3,14 @@ package pay
 import "encoding/xml"
 
 type EntPayQueryRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
 	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
 }
 
 type EntPayQueryResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
@@ -24,6 +26,7 @@ type EntPayQueryResult struct {
 }
 
 type EntPayBankRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
 	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
@@ -35,6 +38,7 @@ type EntPayBankRequest struct {
 }
 
 type EntPayBankResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	Amount         uint64 `json:"amount" xml:"amount"`
@@ -44,6 +48,7 @@ type EntPayBankResult struct {
 }
 
 type EntPayBankQueryRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	EntPayQueryRequest
 
 	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
@@ -54,6 +59,7 @@ func (r EntPayQueryRequest) IsIgnoreAppId() bool {
 }
 
 type EntPayBankQueryResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	PartnerTradeNo string `json:"partner_trade_no" xml:"partner_trade_no"`
@@ -69,6 +75,7 @@ type EntPayBankQueryResult struct {
 }
 
 type EntPayRedPackRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
 	MchBillNo           string `json:"mch_billno" xml:"mch_billno"`
@@ -101,6 +108,7 @@ func (r EntPayRedPackRequest) IsWxWorkSign() bool {
 }
 
 type EntPayRedPackResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	MchBillNo           string `json:"mch_billno" xml:"mch_billno"`
@@ -114,12 +122,14 @@ type EntPayRedPackResult struct {
 }
 
 type EntPayRedPackQueryRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 
 	MchBillNo string `json:"mch_billno" xml:"mch_billno"`
 }
 
 type EntPayRedPackQueryResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	MchBillNo           string `json:"mch_billno" xml:"mch_billno"`
@@ -141,6 +151,7 @@ type EntPayRedPackQueryResult struct {
 }
 
 type GetPublicKeyResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	PubKey string `json:"pub_key" xml:"pub_key"`
@@ -169,6 +180,7 @@ func (r WxEntPayRequest) IgnoredParamsForSign() []string {
 
 // 提现响应对象
 type WxEntPayResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	MchId          string `json:"mchid" xml:"mchid"`

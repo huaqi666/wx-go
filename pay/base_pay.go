@@ -1,16 +1,20 @@
 package pay
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"github.com/beevik/etree"
 	"github.com/cliod/wx-go/common"
+	"github.com/cliod/wx-go/common/util"
 	"strconv"
+	"strings"
 )
 
 // 默认参数，与基础参数一致
 type WxPayDefaultRequest struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayRequest
 }
 
@@ -386,6 +390,7 @@ func (r *WxPayRefundQueryResult) Compose() {
 }
 
 type WxPayOrderNotifyResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 
 	PromotionDetail    string   `json:"promotion_detail" xml:"promotion_detail"`
@@ -442,11 +447,42 @@ func (r *WxPayOrderNotifyResult) Compose() {
 }
 
 type WxPayRefundNotifyResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
+
+	ReqInfoString    string  `json:"-" xml:"req_info"`
+	ReqInfo          ReqInfo `json:"req_info" xml:"-"`
+	DecryptedReqInfo string  `json:"-" xml:"-"`
+
+	MchKey string `json:"-" xml:"-"`
+}
+
+func (r *WxPayRefundNotifyResult) Compose() {
+	if r.ReturnCode == common.Fail {
+		return
+	}
+	// 1.对加密串A做base64解码，得到加密串B
+	data := base64.StdEncoding.EncodeToString([]byte(r.ReqInfoString))
+	// 2.对商户key做md5，得到32位小写key*
+	key := strings.ToLower(util.Md5(r.MchKey))
+	// 3.用key*对加密串B做AES-256-ECB解密
+	b := util.AesDecryptECB([]byte(data), []byte(key))
+	r.DecryptedReqInfo = string(b)
+	_ = xml.Unmarshal(b, &r.ReqInfo)
+}
+
+type WxScanPayNotifyResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
+	BaseWxPayResult
+
+	Openid      string `json:"openid" xml:"openid"`
+	IsSubscribe string `json:"is_subscribe" xml:"is_subscribe"`
+	ProductId   string `json:"product_id" xml:"product_id"`
 }
 
 // 沙河请求签名结果
 type WxPaySandboxSignKeyResult struct {
+	XMLName xml.Name `xml:"xml" json:"-"`
 	BaseWxPayResult
 	SandboxSignkey string `json:"sandbox_signkey" xml:"sandbox_signkey"`
 }

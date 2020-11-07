@@ -100,6 +100,12 @@ type WxPayService interface {
 	/* 解析支付结果通知.
 	   详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7 */
 	ParseOrderNotifyResult(xmlData string, signType SignType) (*WxPayOrderNotifyResult, error)
+	/* 解析退款结果通知
+	   详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_16&index=9 */
+	ParseRefundNotifyResult(xmlData string) (*WxPayRefundNotifyResult, error)
+	/* 解析扫码支付回调通知
+	   详见https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_4 */
+	ParseScanPayNotifyResult(xmlData string) (*WxScanPayNotifyResult, error)
 
 	// 获取配置
 	GetWxPayConfig() *WxPayConfig
@@ -377,6 +383,33 @@ func (p *WxPayV2ServiceImpl) ParseOrderNotifyResult(xmlData string, signType Sig
 	return &res, err
 }
 
+func (p *WxPayV2ServiceImpl) ParseRefundNotifyResult(xmlData string) (*WxPayRefundNotifyResult, error) {
+
+	var res WxPayRefundNotifyResult
+	err := xml.Unmarshal([]byte(xmlData), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	res.MchKey = p.GetWxPayConfig().MchKey
+	res.Compose()
+
+	return &res, err
+}
+
+func (p *WxPayV2ServiceImpl) ParseScanPayNotifyResult(xmlData string) (*WxScanPayNotifyResult, error) {
+
+	var res WxScanPayNotifyResult
+	err := xml.Unmarshal([]byte(xmlData), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res.CheckResult(p, p.GetWxPayConfig().SignType, false)
+
+	return &res, err
+}
+
 func (p *WxPayV2ServiceImpl) SetWxPayConfig(config *WxPayConfig) {
 	p.config = config
 }
@@ -418,6 +451,7 @@ func (p *WxPayV2ServiceImpl) Do(url string, request WxPayRequest, res WxPayResul
 	}
 
 	if err == nil {
+		res.Compose()
 		err = res.CheckResult(p, request.GetSignType(), true)
 	}
 	return err
