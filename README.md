@@ -1,7 +1,9 @@
-## wx-go - 微信开发 Golang SDK（开发工具包） [![WxJava](https://avatars1.githubusercontent.com/u/19882207?s=200&v=4)](https://github.com/Wechat-Group/WxJava) 
+## wx-go - 微信开发 Golang SDK（开发工具包） 
 
 [![travis-image]][travis-url]
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+本项目从 [WxJava](https://github.com/Wechat-Group/WxJava) 转化而来。
 
 #### 支持包括微信支付、公众号、小程序等微信功能的后端开发。
 
