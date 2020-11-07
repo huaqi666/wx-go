@@ -21,8 +21,16 @@ const (
 	MaQrcodeUrl          = ApiDefaultHostUrl + "/cgi-bin/wxaapp/createwxaqrcode" + ApiSuffix
 	MaQrWxaCodeUrl       = ApiDefaultHostUrl + "/wxa/getwxacode" + ApiSuffix
 	MaQrCodeUnlimitedUrl = ApiDefaultHostUrl + "/wxa/getwxacodeunlimit" + ApiSuffix
+	MaGetPaidUnionIdUrl  = ApiDefaultHostUrl + "/wxa/getpaidunionid" + ApiSuffix
 
 	MaSetUserStorage = ApiDefaultHostUrl + "/wxa/set_user_storage?appid=%s&signature=%s&openid=%s&sig_method=%s"
+
+	MaGetPubTemplateTitleListUrl    = ApiDefaultHostUrl + "/wxaapi/newtmpl/getpubtemplatetitles" + ApiSuffix
+	MaGetPubTemplateKeyWordsByIdUrl = ApiDefaultHostUrl + "/wxaapi/newtmpl/getpubtemplatekeywords" + ApiSuffix
+	MaTemplateListUrl               = ApiDefaultHostUrl + "/wxaapi/newtmpl/gettemplate" + ApiSuffix
+	MaGetCategoryUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/getcategory" + ApiSuffix
+	MaTemplateDelUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/deltemplate" + ApiSuffix
+	MaTemplateAddUrl                = ApiDefaultHostUrl + "/wxaapi/newtmpl/addtemplate" + ApiSuffix
 )
 
 // mp

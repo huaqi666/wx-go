@@ -158,7 +158,7 @@ func (r *WxMpUserServiceImpl) GetUserInfoListBy(arr []*WxMpUserQueryParam) ([]*W
 		return nil, err
 	}
 	var res []*WxMpUser
-	err = r.service.PostFor(&res, common.MpUserInfoBatchGetUrl, "", data, at.AccessToken)
+	err = r.service.PostFor(&res, common.MpUserInfoBatchGetUrl, common.PostJsonContentType, data, at.AccessToken)
 	return res, err
 }
 
@@ -187,6 +187,6 @@ func (r *WxMpUserServiceImpl) ChangeOpenid(fromAppId string, openidArr ...string
 	}
 
 	var res []*WxMpChangeOpenid
-	err = r.service.PostFor(&res, common.MpUserChangeOpenidUrl, "", data, at.AccessToken)
+	err = r.service.PostFor(&res, common.MpUserChangeOpenidUrl, common.PostJsonContentType, data, at.AccessToken)
 	return res, err
 }

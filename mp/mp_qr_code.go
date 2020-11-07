@@ -71,7 +71,7 @@ func (r *WxMpQrcodeServiceImpl) getQrCodeTicket(actionName ActionName, sceneStr 
 	}
 
 	var res WxMpQrCodeTicket
-	err = r.service.PostFor(&res, common.MpQrcodeUrl, "", data, at.AccessToken)
+	err = r.service.PostFor(&res, common.MpQrcodeUrl, common.PostJsonContentType, data, at.AccessToken)
 	if err != nil {
 		return nil, err
 	}
