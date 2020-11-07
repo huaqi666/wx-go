@@ -2,7 +2,6 @@ package pay
 
 import (
 	"encoding/xml"
-	"fmt"
 	"github.com/cliod/wx-go/common"
 	"github.com/cliod/wx-go/common/util"
 )
@@ -145,8 +144,29 @@ type BaseWxPayResult struct {
 }
 
 func (r *BaseWxPayResult) Error() string {
-	return fmt.Sprintf("返回代码：%s，返回信息：%s，结果代码：%s，结果信息：%s，错误代码：%s，错误详情：%s，错误信息：%s",
-		r.ReturnCode, r.ReturnMsg, r.ResultCode, r.RetMsg, r.ErrCode, r.ErrCodeDes, r.ErrMsg)
+	var errorMsg string
+	if msg := util.TrimToUpper(r.ReturnCode); msg != "" {
+		errorMsg += "返回代码：" + msg
+	}
+	if msg := util.TrimToUpper(r.ReturnMsg); msg != "" {
+		errorMsg += "，返回信息：" + msg
+	}
+	if msg := util.TrimToUpper(r.ResultCode); msg != "" {
+		errorMsg += "，结果代码：" + msg
+	}
+	if msg := util.TrimToUpper(r.RetMsg); msg != "" {
+		errorMsg += "，结果信息：" + msg
+	}
+	if msg := util.TrimToUpper(r.ErrCode); msg != "" {
+		errorMsg += "，错误代码：" + msg
+	}
+	if msg := util.TrimToUpper(r.ErrCodeDes); msg != "" {
+		errorMsg += "，错误详情：" + msg
+	}
+	if msg := util.TrimToUpper(r.ErrMsg); msg != "" {
+		errorMsg += "，错误信息：" + msg
+	}
+	return errorMsg
 }
 
 func (r *BaseWxPayResult) CheckResult(service WxPayService, signType SignType, checkSuccess bool) error {

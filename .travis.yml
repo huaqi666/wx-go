@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.14.x
+  - 1.15.x
+  - main
+
+script:
+  - go test
+
+branches:
+  only:
+    - main
+
+notifications:
+  email:
+    - qi2415@qq.com
