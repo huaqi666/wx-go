@@ -6,7 +6,24 @@ import (
 
 func TestAll(t *testing.T) {
 
-	c := GetConfig()
+	c := WxConfig{
+		Ma: Config{
+			AppId:  "",
+			Secret: "",
+			Openid: "",
+		},
+		Mp: Config{
+			AppId:  "",
+			Secret: "",
+			Openid: "",
+		},
+		Pay: Config{
+			AppId:  "",
+			MchId:  "",
+			MchKey: "",
+			Openid: "",
+		},
+	}
 
 	maTest(c.Ma)
 
