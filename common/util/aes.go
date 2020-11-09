@@ -2,6 +2,8 @@ package util
 
 import "crypto/aes"
 
+// AES-256-ECB解密
+// encrypted解压数据
 func AesDecryptECB(encrypted []byte, key []byte) (decrypted []byte) {
 	cipher, _ := aes.NewCipher(generateKey(key))
 	decrypted = make([]byte, len(encrypted))
@@ -18,6 +20,7 @@ func AesDecryptECB(encrypted []byte, key []byte) (decrypted []byte) {
 	return decrypted[:trim]
 }
 
+// 获取公钥
 func generateKey(key []byte) (genKey []byte) {
 	genKey = make([]byte, 16)
 	copy(genKey, key)

@@ -11,7 +11,7 @@ import (
 	"reflect"
 )
 
-// http请求
+// http请求接口
 type Service interface {
 	// 执行Get请求
 	Get(url string, args ...interface{}) ([]byte, error)

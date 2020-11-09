@@ -5,6 +5,11 @@ import (
 	"errors"
 )
 
+// cbc解密用户信息
+// sessionKey 微信 session_key
+// rawData 不包括敏感信息的原始数据字符串，用于计算签名。
+// encryptedData 包括敏感数据在内的完整用户信息的加密数据
+// ivStr 加密算法的初始向量
 func Decrypt(v interface{}, sessionKey, encryptedData, ivStr string) error {
 	raw, err := decryptData(sessionKey, encryptedData, ivStr)
 	if err != nil {

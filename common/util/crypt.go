@@ -31,7 +31,7 @@ func createSignature(parts ...string) string {
 	return hex.EncodeToString(raw[:])
 }
 
-// cbcEncrypt CBC 加密数据
+// CBC 加密数据
 func cbcEncrypt(key, plaintext, iv []byte) ([]byte, error) {
 	if len(plaintext)%aes.BlockSize != 0 {
 		return nil, errors.New("plaintext is not a multiple of the block size")
@@ -79,7 +79,7 @@ func cbcDecrypt(key, ciphertext, iv []byte) ([]byte, error) {
 	return pkcs7decode(ciphertext), nil
 }
 
-// decryptData 解密用户数据
+// 解密用户数据
 func decryptData(ssk, ciphertext, iv string) ([]byte, error) {
 	key, err := base64.StdEncoding.DecodeString(ssk)
 	if err != nil {

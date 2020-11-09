@@ -18,6 +18,7 @@ type WxConfig interface {
 	SetAccessToken(*AccessToken)
 }
 
+// access_token接口
 type WxAccessToken interface {
 	// 获取access_token
 	GetAccessToken() (*AccessToken, error)
@@ -27,7 +28,7 @@ type WxAccessToken interface {
 	ExpireAccessToken()
 }
 
-// http请求，获取accessToken
+// wxAPI，获取accessToken，配置管理
 type WxService interface {
 	Service
 	// 获取access_token
@@ -102,18 +103,6 @@ func (s *WxServiceImpl) ForceGetAccessToken(forceRefresh bool) (*AccessToken, er
 	return s.GetWxConfig().GetAccessToken(), nil
 }
 
-func (s *WxServiceImpl) GetWxConfig() WxConfig {
-	return s.config
-}
-
-func (s *WxServiceImpl) SetWxConfig(config WxConfig) {
-	s.config = config
-}
-
-func (s *WxServiceImpl) SetHttpService(service Service) {
-	s.http = service
-}
-
 func (s *WxServiceImpl) IsAccessTokenExpired() bool {
 	c := s.GetWxConfig()
 	tok := c.GetAccessToken()
@@ -128,4 +117,16 @@ func (s *WxServiceImpl) IsAccessTokenExpired() bool {
 
 func (s *WxServiceImpl) ExpireAccessToken() {
 	s.config.SetAccessToken(nil)
+}
+
+func (s *WxServiceImpl) GetWxConfig() WxConfig {
+	return s.config
+}
+
+func (s *WxServiceImpl) SetWxConfig(config WxConfig) {
+	s.config = config
+}
+
+func (s *WxServiceImpl) SetHttpService(service Service) {
+	s.http = service
 }
