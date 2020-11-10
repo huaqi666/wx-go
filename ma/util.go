@@ -5,7 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/cliod/wx-go/common/util"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func CheckSignature(token, timestamp, nonce, signature string) bool {
@@ -48,4 +50,21 @@ func CheckAndGetUserInfo(sessionKey, rawData, encryptedData, signature, ivStr st
 	var usrInfo UserInfo
 	err := util.DecryptInfo(&usrInfo, sessionKey, rawData, encryptedData, signature, ivStr)
 	return &usrInfo, err
+}
+
+func CreateJsapiSignature(url, appId, ticket string) (*WxJsapiSignature, error) {
+	timestamp := strconv.Itoa(time.Now().Second())
+	randomStr := util.RandSeq(16)
+	arr := []string{"jsapi_ticket=" + ticket, "noncestr=" + randomStr, "timestamp=" + timestamp, "url=" + url}
+	signature, err := util.GenWithAmple(arr)
+	if err != nil {
+		return nil, err
+	}
+	return &WxJsapiSignature{
+		AppId:     appId,
+		Timestamp: timestamp,
+		NonceStr:  randomStr,
+		Url:       url,
+		Signature: signature,
+	}, nil
 }

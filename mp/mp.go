@@ -75,13 +75,14 @@ func (s *WxMpServiceImpl) GetTicket(ticketType TicketType) (*Ticket, error) {
 }
 
 func (s *WxMpServiceImpl) ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error) {
-	b := s.GetWxMpConfig().IsTicketExpired(ticketType)
+	conf := s.GetWxMpConfig()
+	b := conf.IsTicketExpired(ticketType)
 	if forceRefresh || b {
 		tt, err := s.getTicket(ticketType)
-		s.GetWxMpConfig().UpdateTicket(ticketType, tt)
+		conf.UpdateTicket(ticketType, tt)
 		return tt, err
 	}
-	return s.GetWxMpConfig().GetTicket(ticketType), nil
+	return conf.GetTicket(ticketType), nil
 }
 
 func (s *WxMpServiceImpl) getTicket(ticketType TicketType) (*Ticket, error) {

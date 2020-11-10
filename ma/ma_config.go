@@ -1,6 +1,10 @@
 package ma
 
-import "github.com/cliod/wx-go/common"
+import (
+	"github.com/cliod/wx-go/common"
+	"strconv"
+	"time"
+)
 
 type WxMaConfig interface {
 	common.WxConfig
@@ -8,6 +12,11 @@ type WxMaConfig interface {
 	GetToken() string
 	GetAesKey() string
 	GetMsgDataFormat() string
+
+	GetTicket(TicketType) *Ticket
+	UpdateTicket(TicketType, *Ticket)
+	IsTicketExpired(TicketType) bool
+	ExpireTicket(TicketType)
 }
 
 type WxMaConfigImpl struct {
@@ -18,6 +27,10 @@ type WxMaConfigImpl struct {
 	Token         string
 	AesKey        string
 	MsgDataFormat string
+
+	JsapiTicket  *Ticket
+	SdkTicket    *Ticket
+	WxCardTicket *Ticket
 }
 
 func newWxMaConfig(appId, secret string) *WxMaConfigImpl {
@@ -53,6 +66,44 @@ func (c *WxMaConfigImpl) GetAesKey() string {
 
 func (c *WxMaConfigImpl) GetMsgDataFormat() string {
 	return c.MsgDataFormat
+}
+
+func (c *WxMaConfigImpl) GetTicket(ticketType TicketType) *Ticket {
+	switch ticketType {
+	case JSAPI:
+		return c.JsapiTicket
+	case SDK:
+		return c.SdkTicket
+	case WxCard:
+		return c.WxCardTicket
+	}
+	return c.JsapiTicket
+}
+
+func (c *WxMaConfigImpl) UpdateTicket(ticketType TicketType, ticket *Ticket) {
+	switch ticketType {
+	case JSAPI:
+		c.JsapiTicket = ticket
+	case SDK:
+		c.SdkTicket = ticket
+	case WxCard:
+		c.WxCardTicket = ticket
+	}
+}
+
+func (c *WxMaConfigImpl) IsTicketExpired(ticketType TicketType) bool {
+	tt := c.GetTicket(ticketType)
+	if tt == nil {
+		// 过期
+		return true
+	}
+	ei := strconv.FormatUint(tt.ExpiresIn, 10)
+	m, _ := time.ParseDuration(ei + "s")
+	return tt.Time.Add(m).Before(time.Now())
+}
+
+func (c *WxMaConfigImpl) ExpireTicket(ticketType TicketType) {
+	c.UpdateTicket(ticketType, nil)
 }
 
 func NewWxMaConfig(appId, secret string) WxMaConfig {
