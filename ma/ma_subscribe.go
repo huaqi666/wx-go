@@ -27,7 +27,7 @@ type WxMaSubscribeService interface {
 	GetCategory() (*WxMaCategoryListResult, error)
 	/* 发送订阅消息
 	   详情请见: https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html */
-	SendMsg(msg *WxMaSubscribeMessage)
+	SendMsg(msg *WxMaSubscribeMessage) error
 }
 
 type WxMaSubscribeServiceImpl struct {
@@ -104,6 +104,6 @@ func (i *WxMaSubscribeServiceImpl) GetCategory() (*WxMaCategoryListResult, error
 	return &res, err
 }
 
-func (i *WxMaSubscribeServiceImpl) SendMsg(msg *WxMaSubscribeMessage) {
-	i.service.GetWxMaMessageService().SendSubscribeMsg(msg)
+func (i *WxMaSubscribeServiceImpl) SendMsg(msg *WxMaSubscribeMessage) error {
+	return i.service.GetWxMaMessageService().SendSubscribeMsg(msg)
 }
