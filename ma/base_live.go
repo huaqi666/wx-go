@@ -2,64 +2,43 @@ package ma
 
 import "github.com/cliod/wx-go/common"
 
-// 直播间信息
-type RoomInfo struct {
-	Name         string   `json:"name"`
-	CoverImg     string   `json:"coverImg"`
-	ShareImg     string   `json:"shareImg"`
-	LiveStatus   uint64   `json:"liveStatus"`
-	StartTime    uint64   `json:"startTime"`
-	EndTime      uint64   `json:"endTime"`
-	AnchorName   string   `json:"anchorName"`
-	AnchorWechat string   `json:"anchorWechat"`
-	AnchorImg    string   `json:"anchorImg"`
-	TypeNum      uint64   `json:"type"`
-	ScreenType   uint64   `json:"screenType"`
-	CloseLike    uint64   `json:"closeLike"`
-	CloseGoods   uint64   `json:"closeGoods"`
-	CloseComment uint64   `json:"closeComment"`
-	CloseReplay  uint64   `json:"closeReplay"`
-	CloseShare   uint64   `json:"closeShare"`
-	CloseKf      uint64   `json:"closeKf"`
-	Goods        []*Goods `json:"goods"`
+type WxLiveCreateRoomRequest struct {
+	RoomInfoBase
+	/* 主播副号微信号
+	   如果未实名认证，需要先前往“小程序直播”小程序进行实名验证
+	   小程序二维码链接：https://res.wx.qq.com/op_res/BbVNeczA1XudfjVqCVoKgfuWe7e3aUhokktRVOqf_F0IqS6kYR--atCpVNUUC3zr */
+	SubAnchorWechat string `json:"subAnchorWechat"`
+	// 直播间类型 【1: 推流，0：手机直播】
+	TypeNum uint64 `json:"type"`
+	// 横屏、竖屏 【1：横屏，0：竖屏】（横屏：视频宽高比为16:9、4:3、1.85:1 ；竖屏：视频宽高比为9:16、2:3）
+	ScreenType uint64 `json:"screenType"`
 }
 
-type RoomInfoRequest struct {
-	RoomInfo
-}
-
-type RoomInfos struct {
-	RoomInfo
-	Roomid uint64 `json:"roomid"`
-}
-
-// 商品信息
-type Goods struct {
-	GoodsId     uint64 `json:"goods_id"`
-	CoverImgUrl string `json:"cover_img_url"`
-	Url         string `json:"url"`
-	PriceType   uint64 `json:"price_type"`
-	Price       string `json:"price"`
-	Price2      string `json:"price_2"`
-	Name        string `json:"name"`
-	// 1, 2：表示是为api添加商品，否则是在MP添加商品
-	ThirdPartyTag string `json:"third_party_tag"`
-}
-
-type RoomInfoResult struct {
+type WxLiveCreateRoomResult struct {
 	common.Err
 	RoomId uint64 `json:"roomId"`
 	// "小程序直播" 小程序码, 当主播微信号没有在 “小程序直播“ 小程序实名认证 返回该字段
 	QrcodeUrl string `json:"qrcode_url"`
 }
 
+type WxLiveEditRoomRequest struct {
+	RoomInfoBase
+	// 直播间id
+	Id uint64 `json:"id"`
+}
+
+type WxLiveEditRoomResult struct {
+	common.Err
+}
+
 // 直播信息
 type WxMaLiveResult struct {
 	common.Err
 
-	Total     uint64       `json:"total"`
-	AuditId   uint64       `json:"audit_id"`
-	GoodsId   uint64       `json:"goods_id"`
-	Goods     []*Goods     `json:"goods"`
-	RoomInfos []*RoomInfos `json:"room_info"`
+	Total      uint64                     `json:"total"`
+	AuditId    uint64                     `json:"auditId"`
+	GoodsId    uint64                     `json:"goodsId"`
+	Goods      []*WxMaLiveGoodsResult     `json:"goods"`
+	RoomInfos  []*WxMaLiveRoomInfosResult `json:"room_info"`
+	LiveReplay []*WxMaLiveReplayResult    `json:"live_replay"`
 }

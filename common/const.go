@@ -39,6 +39,7 @@ const (
 	MaActivityIdCreateUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/activityid/create" + ApiSuffix
 
 	MaCreateRoom  = ApiDefaultHostUrl + "/wxaapi/broadcast/room/create" + ApiSuffix
+	MaEditRoom    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/editroom" + ApiSuffix
 	MaGetLiveInfo = ApiDefaultHostUrl + "/wxa/business/getliveinfo" + ApiSuffix
 	MaAddGoods    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/addgoods" + ApiSuffix
 )

@@ -10,9 +10,13 @@ type WxMaLiveService interface {
 	/* 创建直播间
 	   调用此接口创建直播间，创建成功后将在直播间列表展示，调用额度：10000次/一天
 	   文档地址：https://developers.weixin.qq.com/miniprogram/dev/framework/liveplayer/studio-api.html#1 */
-	CreateRoom(info *RoomInfoRequest) (*RoomInfoResult, error)
+	CreateRoom(*WxLiveCreateRoomRequest) (*WxLiveCreateRoomResult, error)
+	/* 编辑直播间
+	   调用此接口创建直播间，创建成功后将在直播间列表展示，调用额度：10000次/一天
+	   文档地址：https://developers.weixin.qq.com/miniprogram/dev/framework/liveplayer/studio-api.html#6 */
+	EditRoom(*WxLiveEditRoomRequest) (*WxLiveEditRoomResult, error)
 	// 获取直播房间列表.（分页）
-	GetLiveInfos() ([]*RoomInfos, error)
+	GetLiveInfos() ([]*WxMaLiveRoomInfosResult, error)
 	// 获取所有直播间信息（没有分页直接获取全部）
 	GetLiveInfo(start, limit int) (*WxMaLiveResult, error)
 	// 获取直播房间回放数据信息.
@@ -33,16 +37,24 @@ func newWxMaLiveService(service WxMaService) *WxMaLiveServiceImpl {
 	}
 }
 
-func (l *WxMaLiveServiceImpl) CreateRoom(info *RoomInfoRequest) (*RoomInfoResult, error) {
+func (l *WxMaLiveServiceImpl) CreateRoom(info *WxLiveCreateRoomRequest) (*WxLiveCreateRoomResult, error) {
 	url := common.MaCreateRoom
 
-	var res RoomInfoResult
+	var res WxLiveCreateRoomResult
 	err := l.service.PostFor(&res, url, common.PostJsonContentType, info)
 	return &res, err
 }
 
-func (l *WxMaLiveServiceImpl) GetLiveInfos() ([]*RoomInfos, error) {
-	var arr []*RoomInfos
+func (l *WxMaLiveServiceImpl) EditRoom(info *WxLiveEditRoomRequest) (*WxLiveEditRoomResult, error) {
+	url := common.MaEditRoom
+
+	var res WxLiveEditRoomResult
+	err := l.service.PostFor(&res, url, common.PostJsonContentType, info)
+	return &res, err
+}
+
+func (l *WxMaLiveServiceImpl) GetLiveInfos() ([]*WxMaLiveRoomInfosResult, error) {
+	var arr []*WxMaLiveRoomInfosResult
 	start := 0
 	limit := 80
 	total := uint64(0)
