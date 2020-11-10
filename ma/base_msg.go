@@ -1,5 +1,6 @@
 package ma
 
+// 订阅消息
 type WxMaSubscribeMessage struct {
 	ToUser           string           `json:"to_user"`
 	TemplateId       string           `json:"template_id"`
@@ -35,6 +36,7 @@ func AddData(msg *WxMaSubscribeMessage, arr ...*Data) {
 	}
 }
 
+// 下发的服务消息
 type WxMaUniformMessage struct {
 	IsMpTemplateMsg bool                `json:"is_mp_template_msg"`
 	ToUser          string              `json:"to_user"`
@@ -48,6 +50,7 @@ type WxMaUniformMessage struct {
 	EmphasisKeyword string              `json:"emphasis_keyword"`
 }
 
+// 客服消息
 type WxMaKefuMessage struct {
 	ToUser  string   `json:"touser"`
 	MsgType string   `json:"msgtype"`
@@ -57,6 +60,7 @@ type WxMaKefuMessage struct {
 	MaPage  KfMaPage `json:"miniprogrampage"`
 }
 
+// 上报信息
 type WxMaUpdatableMsg struct {
 	ActivityId   string           `json:"activity_id"`
 	TargetState  uint64           `json:"target_state"`

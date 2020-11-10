@@ -2,6 +2,7 @@ package ma
 
 import "github.com/cliod/wx-go/common"
 
+// 直播间信息
 type RoomInfo struct {
 	Name         string   `json:"name"`
 	CoverImg     string   `json:"coverImg"`
@@ -32,6 +33,7 @@ type RoomInfos struct {
 	Roomid uint64 `json:"roomid"`
 }
 
+// 商品信息
 type Goods struct {
 	GoodsId     uint64 `json:"goods_id"`
 	CoverImgUrl string `json:"cover_img_url"`
@@ -51,6 +53,7 @@ type RoomInfoResult struct {
 	QrcodeUrl string `json:"qrcode_url"`
 }
 
+// 直播信息
 type WxMaLiveResult struct {
 	common.Err
 

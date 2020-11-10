@@ -9,14 +9,14 @@ type WxMaService interface {
 	// 获取配置
 	GetWxMaConfig() WxMaConfig
 	// 设置配置
-	SetWxMaConfig(config WxMaConfig)
+	SetWxMaConfig(WxMaConfig)
 
 	// jsCode换取openid
 	JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error)
 	// 验证消息的确来自微信服务器
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319&token=&lang=zh_CN
 	CheckSignature(timestamp, nonce, signature string) bool
-	/* 用户支付完成后，获取该用户的 UnionId，无需用户授权。本接口支持第三方平台代理查询。
+	/* 用户支付完成后，获取该用户的UnionId，无需用户授权。本接口支持第三方平台代理查询。
 	   注意：调用前需要用户完成支付，且在支付后的五分钟内有效。
 	   文档地址：https://developers.weixin.qq.com/miniprogram/dev/api/getPaidUnionId.html */
 	GetPaidUnionId(openid, transactionId, mchId, outTradeNo string) (*WxMaUnionIdResult, error)
@@ -24,7 +24,7 @@ type WxMaService interface {
 	// 获取用户接口
 	GetWxMaUserService() WxMaUserService
 	// 设置(用户自定义的)用户接口
-	SetWxMaUserService(userService WxMaUserService)
+	SetWxMaUserService(WxMaUserService)
 	// 获取二维码接口
 	GetWxMaQrcodeService() WxMaQrcodeService
 	// 获取订阅接口
@@ -34,13 +34,13 @@ type WxMaService interface {
 	// 获取消息接口
 	GetWxMaMessageService() WxMaMsgService
 	// 设置(用户自定义的)二维码接口
-	SetWxMaQrcodeService(qrcodeService WxMaQrcodeService)
+	SetWxMaQrcodeService(WxMaQrcodeService)
 	// 设置(用户自定义的)订阅接口
-	SetWxMaSubscribeService(subscribeService WxMaSubscribeService)
+	SetWxMaSubscribeService(WxMaSubscribeService)
 	// 设置(用户自定义的)分享接口
-	SetWxMaShareService(shareService WxMaShareService)
+	SetWxMaShareService(WxMaShareService)
 	// 设置(用户自定义的)消息接口
-	SetWxMaMsgService(msgService WxMaMsgService)
+	SetWxMaMsgService(WxMaMsgService)
 }
 
 type WxMaServiceImpl struct {

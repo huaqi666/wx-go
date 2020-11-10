@@ -88,7 +88,7 @@ type WxPayService interface {
 	     提交退款申请后，通过调用该接口查询退款状态。退款有一定延时，用零钱支付的退款20分钟内到账，
 	     银行卡支付的退款3个工作日后重新查询退款状态。
 	   详见 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_5 */
-	RefundQuery(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
+	RefundQuery(*WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
 	/* 微信支付-查询退款API（支持单品）.
 	   应用场景：提交退款申请后，通过调用该接口查询退款状态。退款有一定延时，用零钱支付的退款20分钟内到账，银行卡支付的退款3个工作日后重新查询退款状态。
 	   注意：
@@ -96,7 +96,7 @@ type WxPayService interface {
 	      请见https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_5
 	   2、请求频率限制：300qps，即每秒钟正常的退款查询请求次数不超过300次
 	   3、错误或无效请求频率限制：6qps，即每秒钟异常或错误的退款查询请求不超过6次 */
-	RefundQueryV2(request *WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
+	RefundQueryV2(*WxPayRefundQueryRequest) (*WxPayRefundQueryResult, error)
 	/* 解析支付结果通知.
 	   详见https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7 */
 	ParseOrderNotifyResult(xmlData string, signType SignType) (*WxPayOrderNotifyResult, error)

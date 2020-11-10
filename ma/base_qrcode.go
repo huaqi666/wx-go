@@ -23,9 +23,9 @@ type WxaCodeUnlimited struct {
 
 // 二维码线颜色
 type CodeLineColor struct {
-	R string
-	B string
-	G string
+	R string `json:"r"`
+	B string `json:"b"`
+	G string `json:"g"`
 }
 
 // 默认白色

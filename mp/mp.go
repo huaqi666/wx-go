@@ -23,7 +23,7 @@ type WxMpService interface {
 	ForceGetJsapiTicket(bool) (*Ticket, error)
 
 	// 获得ticket,不强制刷新ticket.
-	GetTicket(ticketType TicketType) (*Ticket, error)
+	GetTicket(TicketType) (*Ticket, error)
 	// 获得时会检查 Token是否过期，如果过期了，那么就刷新一下，否则就什么都不干
 	ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error)
 

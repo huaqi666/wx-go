@@ -2,23 +2,27 @@ package ma
 
 import "github.com/cliod/wx-go/common"
 
+// 订阅的公共模板
 type WxMaPubTemplateTitleListResult struct {
 	common.Err
 	Count uint64          `json:"count"`
 	Data  []*TemplateItem `json:"data"`
 }
 
+// 模板标题下关键词库结果
 type WxMaPubTemplateKeywordListResult struct {
 	common.Err
 	Count uint64                `json:"count"`
 	Data  []*PubTemplateKeyword `json:"data"`
 }
 
+// 个人模板结果
 type WxMaTemplateListResult struct {
 	common.Err
 	Data []*TemplateInfo `json:"data"`
 }
 
+// 类目
 type WxMaCategoryListResult struct {
 	common.Err
 	Data []*CategoryData `json:"data"`

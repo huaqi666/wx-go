@@ -4,8 +4,10 @@ import (
 	"github.com/cliod/wx-go/common"
 )
 
+// 小程序版本
 type MiniProgramState string
 
+// 小程序语言
 type MiniProgramLang string
 
 const (
@@ -30,6 +32,7 @@ type JsCode2SessionResult struct {
 	UnionId    string `json:"unionid"`
 }
 
+// 用户的UnionId
 type WxMaUnionIdResult struct {
 	common.Err
 

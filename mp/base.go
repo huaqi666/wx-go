@@ -38,3 +38,10 @@ type WxJsapiSignature struct {
 	Url       string `json:"url"`
 	Signature string `json:"signature"`
 }
+
+// 二维码ticket
+type WxMpQrCodeTicket struct {
+	Ticket        string `json:"ticket"`
+	ExpireSeconds int    `json:"expire_seconds"` // 如果为-1，说明是永久
+	Url           string `json:"url"`
+}
