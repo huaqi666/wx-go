@@ -18,5 +18,52 @@ go get -u github.com/cliod/wx-go
   - 微信支付：`pay`
   - 公众号（包括订阅号和服务号）：`mp`    
 
+### 使用Demo
+公众号使用例子
+```go
+conf := mp.NewWxMpConfig("<appId>", "<secret>")
+service := mp.NewWxMpService(conf)
+
+da, err := service.CreateJsapiSignature("https://www.xxx.com")
+if err == nil {
+    // todo ...
+} else {
+    fmt.Println(err.Error())
+}
+```
+
+小程序使用例子
+```go
+conf := mp.NewWxMaConfig("<appId>", "<secret>")
+service := ma.NewWxMaService(conf)
+
+uc := service.GetWxMaUserService()
+
+res, err := uc.GetSessionInfo("<js_code>")
+if err == nil {
+    // todo ...
+} else {
+    fmt.Println(err.Error())
+}
+```
+
+微信支付使用例子
+```go
+conf := mp.NewWxPayV2Config("<appId>", "<secret>", "<mchId>", "mchKey", "<notifyUrl>", "keyPath")
+service := ma.NewWxPayService(conf)
+
+res, err := service.UnifyPay(&pay.WxPayUnifiedOrderRequest{
+    TotalFee:   100,
+    Openid:     c.Openid,
+    OutTradeNo: s,
+    Body:       "测试数据",
+})
+if err != nil {
+    fmt.Println(err.Error())
+} else {
+    // todo...
+}
+```
+
 [travis-image]: https://api.travis-ci.com/cliod/wx-go.svg?branch=main
 [travis-url]: https://travis-ci.com/cliod/wx-go

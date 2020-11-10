@@ -97,3 +97,7 @@ func (c *WxMpConfigImpl) IsTicketExpired(ticketType TicketType) bool {
 func (c *WxMpConfigImpl) ExpireTicket(ticketType TicketType) {
 	c.UpdateTicket(ticketType, nil)
 }
+
+func NewWxMpConfig(appId, secret string) WxMpConfig {
+	return newWxMpConfig(appId, secret)
+}

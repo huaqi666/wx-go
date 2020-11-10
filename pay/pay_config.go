@@ -46,7 +46,7 @@ func (c *WxPayConfig) GetPayBaseUrl() string {
 	return c.PayBaseUrl
 }
 
-func NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConfig {
+func newWxPayV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConfig {
 	return &WxPayConfig{
 		AppId:     appId,
 		MchId:     mchId,
@@ -58,4 +58,8 @@ func NewBaseV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConf
 
 		PayBaseUrl: common.PayDefaultPayBaseUrl,
 	}
+}
+
+func NewWxPayV2Config(appId, mchId, mchKey, notifyUrl, keyPath string) *WxPayConfig {
+	return newWxPayV2Config(appId, mchId, mchKey, notifyUrl, keyPath)
 }

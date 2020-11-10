@@ -87,7 +87,7 @@ func mpTest(c Config) {
 
 func payTest(c Config) {
 
-	conf := pay.NewBaseV2Config(c.AppId, c.MchId, c.MchKey, "https://www.baidu.com/notify", "")
+	conf := pay.NewWxPayV2Config(c.AppId, c.MchId, c.MchKey, "https://www.baidu.com/notify", "")
 	//conf.UseSandboxEnv = true
 	service := pay.NewWxPayService(conf)
 
