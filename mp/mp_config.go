@@ -2,19 +2,14 @@ package mp
 
 import (
 	"github.com/cliod/wx-go/common"
-	"strconv"
-	"time"
 )
 
 type WxMpConfig interface {
 	common.WxConfig
+	common.WxTicket
 
 	GetToken() string
 	GetAesKey() string
-	GetTicket(TicketType) *Ticket
-	UpdateTicket(TicketType, *Ticket)
-	IsTicketExpired(TicketType) bool
-	ExpireTicket(TicketType)
 }
 
 type WxMpConfigImpl struct {
@@ -22,17 +17,16 @@ type WxMpConfigImpl struct {
 	secret      string
 	AccessToken *common.AccessToken
 
-	Token        string
-	AesKey       string
-	JsapiTicket  *Ticket
-	SdkTicket    *Ticket
-	WxCardTicket *Ticket
+	Token  string
+	AesKey string
+	ticket common.WxTicket
 }
 
 func newWxMpConfig(appId, secret string) WxMpConfig {
 	return &WxMpConfigImpl{
 		appId:  appId,
 		secret: secret,
+		ticket: new(common.WxTicketImpl),
 	}
 }
 
@@ -60,41 +54,23 @@ func (c *WxMpConfigImpl) GetAesKey() string {
 	return c.AesKey
 }
 
-func (c *WxMpConfigImpl) GetTicket(ticketType TicketType) *Ticket {
-	switch ticketType {
-	case JSAPI:
-		return c.JsapiTicket
-	case SDK:
-		return c.SdkTicket
-	case WxCard:
-		return c.WxCardTicket
-	}
-	return c.JsapiTicket
+func (c *WxMpConfigImpl) GetWxTicket() common.WxTicket {
+	return c.ticket
 }
 
-func (c *WxMpConfigImpl) UpdateTicket(ticketType TicketType, ticket *Ticket) {
-	switch ticketType {
-	case JSAPI:
-		c.JsapiTicket = ticket
-	case SDK:
-		c.SdkTicket = ticket
-	case WxCard:
-		c.WxCardTicket = ticket
-	}
+func (c WxMpConfigImpl) GetTicket(ticketType common.TicketType) *common.Ticket {
+	return c.ticket.GetTicket(ticketType)
 }
 
-func (c *WxMpConfigImpl) IsTicketExpired(ticketType TicketType) bool {
-	tt := c.GetTicket(ticketType)
-	if tt == nil {
-		// 过期
-		return true
-	}
-	ei := strconv.FormatUint(tt.ExpiresIn, 10)
-	m, _ := time.ParseDuration(ei + "s")
-	return tt.Time.Add(m).Before(time.Now())
+func (c *WxMpConfigImpl) UpdateTicket(ticketType common.TicketType, ticket *common.Ticket) {
+	c.ticket.UpdateTicket(ticketType, ticket)
 }
 
-func (c *WxMpConfigImpl) ExpireTicket(ticketType TicketType) {
+func (c *WxMpConfigImpl) IsTicketExpired(ticketType common.TicketType) bool {
+	return c.ticket.IsTicketExpired(ticketType)
+}
+
+func (c *WxMpConfigImpl) ExpireTicket(ticketType common.TicketType) {
 	c.UpdateTicket(ticketType, nil)
 }
 

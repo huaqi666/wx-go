@@ -56,3 +56,30 @@ type AccessToken struct {
 	ExpiresIn   uint64    `json:"expires_in"`
 	Time        time.Time `json:"time"`
 }
+
+// ticket类型
+type TicketType string
+
+const (
+	JSAPI  TicketType = "jsapi"
+	SDK    TicketType = "2"
+	WxCard TicketType = "wx_card"
+)
+
+// 授权页ticket
+type Ticket struct {
+	Err
+	Ticket    string    `json:"ticket"`
+	ExpiresIn uint64    `json:"expires_in"`
+	Time      time.Time `json:"time"`
+	Type      string    `json:"type"`
+}
+
+// jspai signature.
+type WxJsapiSignature struct {
+	AppId     string `json:"app_id"`
+	NonceStr  string `json:"nonce_str"`
+	Timestamp string `json:"timestamp"`
+	Url       string `json:"url"`
+	Signature string `json:"signature"`
+}

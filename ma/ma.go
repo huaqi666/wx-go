@@ -2,6 +2,7 @@ package ma
 
 import (
 	"github.com/cliod/wx-go/common"
+	"github.com/cliod/wx-go/common/util"
 )
 
 type WxMaService interface {
@@ -81,7 +82,7 @@ func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResu
 }
 
 func (s *WxMaServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
-	return CheckSignature(s.GetWxMaConfig().GetToken(), timestamp, nonce, signature)
+	return util.CheckSignature(s.GetWxMaConfig().GetToken(), timestamp, nonce, signature)
 }
 
 func (s *WxMaServiceImpl) GetPaidUnionId(openid, transactionId, mchId, outTradeNo string) (*WxMaUnionIdResult, error) {

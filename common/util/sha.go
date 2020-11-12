@@ -47,3 +47,13 @@ func HmacSha256(str, key string) string {
 	h.Write([]byte(str))
 	return strings.ToLower(hex.EncodeToString(h.Sum(nil)))
 }
+
+func CheckSignature(token, timestamp, nonce, signature string) bool {
+	arr := []string{token, timestamp, nonce}
+	gen, err := Gen(arr)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	return gen == signature
+}

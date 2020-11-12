@@ -2,10 +2,12 @@ package mp
 
 import (
 	"github.com/cliod/wx-go/common"
+	"github.com/cliod/wx-go/common/util"
 )
 
 type WxMpService interface {
 	common.WxService
+	common.WxJsapi
 
 	// 获取配置
 	GetWxMpConfig() WxMpConfig
@@ -14,22 +16,6 @@ type WxMpService interface {
 
 	// 验证消息的确来自微信服务器
 	CheckSignature(timestamp, nonce, signature string) bool
-
-	// 获得jsapi_ticket,不强制刷新jsapi_ticket.
-	GetJsapiTicket() (*Ticket, error)
-	// 获得jsapi_ticket.
-	// 获得时会检查jsapiToken是否过期，如果过期了，那么就刷新一下，否则就什么都不干
-	// 详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN
-	ForceGetJsapiTicket(bool) (*Ticket, error)
-
-	// 获得ticket,不强制刷新ticket.
-	GetTicket(TicketType) (*Ticket, error)
-	// 获得时会检查 Token是否过期，如果过期了，那么就刷新一下，否则就什么都不干
-	ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error)
-
-	// 创建调用jsapi时所需要的签名.
-	// 详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN
-	CreateJsapiSignature(url string) (*WxJsapiSignature, error)
 
 	// 获取用户接口
 	GetWxMpUserService() WxMpUserService
@@ -59,43 +45,7 @@ func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
-	return CheckSignature(s.GetWxMpConfig().GetToken(), timestamp, nonce, signature)
-}
-
-func (s *WxMpServiceImpl) GetJsapiTicket() (*Ticket, error) {
-	return s.ForceGetJsapiTicket(false)
-}
-
-func (s *WxMpServiceImpl) ForceGetJsapiTicket(forceRefresh bool) (*Ticket, error) {
-	return s.ForceGetTicket(JSAPI, forceRefresh)
-}
-
-func (s *WxMpServiceImpl) GetTicket(ticketType TicketType) (*Ticket, error) {
-	return s.ForceGetTicket(ticketType, false)
-}
-
-func (s *WxMpServiceImpl) ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error) {
-	conf := s.GetWxMpConfig()
-	b := conf.IsTicketExpired(ticketType)
-	if forceRefresh || b {
-		tt, err := s.getTicket(ticketType)
-		conf.UpdateTicket(ticketType, tt)
-		return tt, err
-	}
-	return conf.GetTicket(ticketType), nil
-}
-
-func (s *WxMpServiceImpl) getTicket(ticketType TicketType) (*Ticket, error) {
-	var ticket Ticket
-
-	err := s.GetFor(&ticket, common.MpGetTicketUrl, ticketType)
-	return &ticket, err
-}
-
-func (s *WxMpServiceImpl) CreateJsapiSignature(url string) (*WxJsapiSignature, error) {
-	jsapiTicket, _ := s.GetJsapiTicket()
-	appId := s.GetWxMpConfig().GetAppID()
-	return CreateJsapiSignature(url, appId, jsapiTicket.Ticket)
+	return util.CheckSignature(s.GetWxMpConfig().GetToken(), timestamp, nonce, signature)
 }
 
 func (s *WxMpServiceImpl) GetWxMpUserService() WxMpUserService {
@@ -122,6 +72,42 @@ func (s *WxMpServiceImpl) SetWxMpConfig(config WxMpConfig) {
 	s.SetWxConfig(config)
 	s.config = config
 	_, _ = s.ForceGetAccessToken(true)
+}
+
+func (s *WxMpServiceImpl) GetJsapiTicket() (*common.Ticket, error) {
+	return s.ForceGetJsapiTicket(false)
+}
+
+func (s *WxMpServiceImpl) ForceGetJsapiTicket(forceRefresh bool) (*common.Ticket, error) {
+	return s.ForceGetTicket(common.JSAPI, forceRefresh)
+}
+
+func (s *WxMpServiceImpl) GetTicket(ticketType common.TicketType) (*common.Ticket, error) {
+	return s.ForceGetTicket(ticketType, false)
+}
+
+func (s *WxMpServiceImpl) ForceGetTicket(ticketType common.TicketType, forceRefresh bool) (*common.Ticket, error) {
+	conf := s.GetWxMpConfig()
+	b := conf.IsTicketExpired(ticketType)
+	if forceRefresh || b {
+		tt, err := s.getTicket(ticketType)
+		conf.UpdateTicket(ticketType, tt)
+		return tt, err
+	}
+	return conf.GetTicket(ticketType), nil
+}
+
+func (s *WxMpServiceImpl) getTicket(ticketType common.TicketType) (*common.Ticket, error) {
+	var ticket common.Ticket
+
+	err := s.GetFor(&ticket, common.MpGetTicketUrl, ticketType)
+	return &ticket, err
+}
+
+func (s *WxMpServiceImpl) CreateJsapiSignature(url string) (*common.WxJsapiSignature, error) {
+	jsapiTicket, _ := s.GetJsapiTicket()
+	appId := s.GetWxMpConfig().GetAppID()
+	return common.CreateJsapiSignature(url, appId, jsapiTicket.Ticket)
 }
 
 func NewWxMpServiceBy(appId, secret string) WxMpService {
