@@ -1,3 +1,4 @@
+// 微信小程序接口
 package ma
 
 import (
@@ -173,4 +174,31 @@ func NewWxMaService(config WxMaConfig) WxMaService {
 		config = new(WxMaConfigImpl)
 	}
 	return newWxMaService(config)
+}
+
+// 将方法静态方便使用
+
+// 获取accessToken
+func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
+	return NewWxMaServiceBy(appId, secret).GetAccessToken()
+}
+
+// 通过jsCode换取openid和sessionKey
+func JsCode2SessionInfo(appId, secret, jsCode string) (*JsCode2SessionResult, error) {
+	return NewWxMaServiceBy(appId, secret).JsCode2SessionInfo(jsCode)
+}
+
+// 获取js_ticket
+func GetJsapiTicket(appId, secret string) (*common.Ticket, error) {
+	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().GetJsapiTicket()
+}
+
+// 获取ticket
+func GetTicket(appId, secret string, t common.TicketType) (*common.Ticket, error) {
+	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().GetTicket(t)
+}
+
+// 创建二维码
+func CreateWxaCodeUnlimited(appId, secret, scene, page string) ([]byte, error) {
+	return NewWxMaServiceBy(appId, secret).GetWxMaQrcodeService().CreateWxaCodeUnlimited(scene, page)
 }

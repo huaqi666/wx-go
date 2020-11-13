@@ -1,3 +1,4 @@
+// 微信公众号接口
 package mp
 
 import (
@@ -119,4 +120,11 @@ func NewWxMpService(config WxMpConfig) WxMpService {
 		config = new(WxMpConfigImpl)
 	}
 	return newWxMpService(config)
+}
+
+// 将方法静态方便使用
+
+// 获取accessToken
+func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
+	return NewWxMpServiceBy(appId, secret).GetAccessToken()
 }
