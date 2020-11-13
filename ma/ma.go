@@ -188,6 +188,11 @@ func JsCode2SessionInfo(appId, secret, jsCode string) (*JsCode2SessionResult, er
 	return NewWxMaServiceBy(appId, secret).JsCode2SessionInfo(jsCode)
 }
 
+// 创建调用jsapi时所需要的签名.
+func CreateJsapiSignatureBy(appId, secret, url string) (*common.WxJsapiSignature, error) {
+	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().CreateJsapiSignature(url)
+}
+
 // 获取js_ticket
 func GetJsapiTicket(appId, secret string) (*common.Ticket, error) {
 	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().GetJsapiTicket()
