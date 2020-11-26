@@ -1,5 +1,6 @@
 package mp
 
+// 永久图文消息素材
 type WxMaterialNewsBatchGetNewsItem struct {
 	MediaId    string           `json:"media_id"`
 	UpdateTime string           `json:"update_time"`
@@ -9,7 +10,7 @@ type WxMaterialNewsBatchGetNewsItem struct {
 type WxMpMaterialNews struct {
 	CreateTime string             `json:"create_time"`
 	UpdateTime string             `json:"update_time"`
-	Articles   []*WxMpNewsArticle `json:"articles"`
+	Articles   []*WxMpNewsArticle `json:"news_item"`
 }
 
 type WxMpNewsArticle struct {
@@ -26,6 +27,7 @@ type WxMpNewsArticle struct {
 	OnlyFansCanComment bool   `json:"only_fans_can_comment"`
 }
 
+// 永久媒体消息素材
 type WxMaterialFileBatchGetNewsItem struct {
 	MediaId    string `json:"media_id"`
 	UpdateTime string `json:"update_time"`

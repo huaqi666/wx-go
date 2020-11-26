@@ -1,4 +1,4 @@
-package main
+package wx
 
 import (
 	"encoding/json"
@@ -6,17 +6,7 @@ import (
 	"os"
 )
 
-func main() {
-
-	c := GetConfig()
-
-	maTest(c.Ma)
-
-	mpTest(c.Mp)
-
-	payTest(c.Pay)
-}
-
+// 测试使用
 type Config struct {
 	AppId  string `json:"app_id"`
 	Secret string `json:"secret"`
@@ -25,17 +15,19 @@ type Config struct {
 	Openid string `json:"openid"`
 }
 
-type WxConfig struct {
+// 测试使用
+type TestConfig struct {
 	Ma  Config `json:"ma"`
 	Mp  Config `json:"mp"`
 	Pay Config `json:"pay"`
 }
 
-func GetConfig() WxConfig {
-	var c WxConfig
-	f, err := os.Open("./config.json")
+// 测试使用
+func GetConfig(filename string) TestConfig {
+	var c TestConfig
+	f, err := os.Open(filename)
 	if err != nil {
-		f, err := os.Create("./config.json")
+		f, err := os.Create(filename)
 		if err != nil {
 			panic(err)
 		}

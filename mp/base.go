@@ -32,7 +32,7 @@ type WxMpMaterialNewsBatchGetResult struct {
 
 	TotalCount uint64                            `json:"total_count"`
 	ItemCount  uint64                            `json:"item_count"`
-	Items      []*WxMaterialNewsBatchGetNewsItem `json:"items"`
+	Items      []*WxMaterialNewsBatchGetNewsItem `json:"item"`
 }
 
 type WxMpMaterialFileBatchGetResult struct {
@@ -40,5 +40,5 @@ type WxMpMaterialFileBatchGetResult struct {
 
 	TotalCount uint64                            `json:"total_count"`
 	ItemCount  uint64                            `json:"item_count"`
-	Item       []*WxMaterialFileBatchGetNewsItem `json:"items"`
+	Items      []*WxMaterialFileBatchGetNewsItem `json:"item"`
 }
