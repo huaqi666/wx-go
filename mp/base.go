@@ -4,14 +4,22 @@ import "github.com/cliod/wx-go/common"
 
 type ActionName string
 
+func (a ActionName) String() string {
+	return string(a)
+}
+
 const (
-	QrScene         = "QR_SCENE"
-	QrStrScene      = "QR_STR_SCENE"
-	QrLimitScene    = "QR_LIMIT_SCENE"
-	QrLimitStrScene = "QR_LIMIT_STR_SCENE"
+	QrScene         ActionName = "QR_SCENE"
+	QrStrScene      ActionName = "QR_STR_SCENE"
+	QrLimitScene    ActionName = "QR_LIMIT_SCENE"
+	QrLimitStrScene ActionName = "QR_LIMIT_STR_SCENE"
 )
 
 type MaterialType string
+
+func (m MaterialType) String() string {
+	return string(m)
+}
 
 const (
 	NEWS  MaterialType = "news"

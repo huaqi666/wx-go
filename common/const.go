@@ -46,7 +46,7 @@ const (
 
 // mp
 const (
-	MpGetTicketUrl = ApiDefaultHostUrl + "/cgi-bin/ticket/getticket" + ApiSuffix + "&type="
+	MpGetTicketUrl = ApiDefaultHostUrl + "/cgi-bin/ticket/getticket" + ApiSuffix + "&type=%s"
 
 	MpQrcodeUrl = ApiDefaultHostUrl + "/cgi-bin/qrcode/create" + ApiSuffix
 
