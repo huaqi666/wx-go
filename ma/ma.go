@@ -37,6 +37,9 @@ type WxMaService interface {
 	GetWxMaMessageService() WxMaMsgService
 	// 获取设置jsapi接口
 	GetWxMaJsapiService() WxMaJsapiService
+	// 获取直播接口
+	GetWxMaLiveService() WxMaLiveService
+
 	// 设置(用户自定义的)二维码接口
 	SetWxMaQrcodeService(WxMaQrcodeService)
 	// 设置(用户自定义的)订阅接口
@@ -45,8 +48,10 @@ type WxMaService interface {
 	SetWxMaShareService(WxMaShareService)
 	// 设置(用户自定义的)消息接口
 	SetWxMaMsgService(WxMaMsgService)
-	// 设置jsapi接口
+	// 设置(用户自定义的)jsapi接口
 	SetWxMaJsapiService(WxMaJsapiService)
+	// 设置(用户自定义的)直播接口
+	SetWxMaLiveService(WxMaLiveService)
 }
 
 type WxMaServiceImpl struct {
@@ -131,6 +136,10 @@ func (s *WxMaServiceImpl) GetWxMaJsapiService() WxMaJsapiService {
 	return s.jsapiService
 }
 
+func (s *WxMaServiceImpl) GetWxMaLiveService() WxMaLiveService {
+	return s.liveService
+}
+
 func (s *WxMaServiceImpl) SetWxMaUserService(userService WxMaUserService) {
 	s.userService = userService
 }
@@ -153,6 +162,10 @@ func (s *WxMaServiceImpl) SetWxMaMsgService(msgService WxMaMsgService) {
 
 func (s *WxMaServiceImpl) SetWxMaJsapiService(jsapiService WxMaJsapiService) {
 	s.jsapiService = jsapiService
+}
+
+func (s *WxMaServiceImpl) SetWxMaLiveService(liveService WxMaLiveService) {
+	s.liveService = liveService
 }
 
 func (s *WxMaServiceImpl) GetWxMaConfig() WxMaConfig {

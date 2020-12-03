@@ -20,20 +20,25 @@ type WxMpService interface {
 
 	// 获取用户接口
 	GetWxMpUserService() WxMpUserService
-	// 设置(用户自定义的)用户接口
-	SetWxMpUserService(WxMpUserService)
 	// 获取二维码接口
 	GetWxMpQrcodeService() WxMpQrcodeService
+	// 获取素材接口
+	GetWxMpMaterialService() WxMpMaterialService
+	// 设置(用户自定义的)用户接口
+	SetWxMpUserService(WxMpUserService)
 	// 设置(用户自定义的)二维码接口
 	SetWxMpQrcodeService(WxMpQrcodeService)
+	// 设置(用户自定义)素材接口
+	SetWxMpMaterialService(service WxMpMaterialService)
 }
 
 type WxMpServiceImpl struct {
 	common.WxServiceImpl
 
-	config        WxMpConfig
-	userService   WxMpUserService
-	qrcodeService WxMpQrcodeService
+	config          WxMpConfig
+	userService     WxMpUserService
+	qrcodeService   WxMpQrcodeService
+	materialService WxMpMaterialService
 }
 
 func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
@@ -42,6 +47,7 @@ func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
 	impl.SetWxMpConfig(config)
 	impl.userService = newWxMpUserService(impl)
 	impl.qrcodeService = newWxMpQrcodeService(impl)
+	impl.materialService = newWxMpMaterialService(impl)
 	return impl
 }
 
@@ -57,12 +63,20 @@ func (s *WxMpServiceImpl) GetWxMpQrcodeService() WxMpQrcodeService {
 	return s.qrcodeService
 }
 
-func (s *WxMpServiceImpl) SetWxMpUserService(userService WxMpUserService) {
-	s.userService = userService
+func (s *WxMpServiceImpl) GetWxMpMaterialService() WxMpMaterialService {
+	return s.materialService
 }
 
-func (s *WxMpServiceImpl) SetWxMpQrcodeService(qrcodeService WxMpQrcodeService) {
-	s.qrcodeService = qrcodeService
+func (s *WxMpServiceImpl) SetWxMpUserService(service WxMpUserService) {
+	s.userService = service
+}
+
+func (s *WxMpServiceImpl) SetWxMpQrcodeService(service WxMpQrcodeService) {
+	s.qrcodeService = service
+}
+
+func (s *WxMpServiceImpl) SetWxMpMaterialService(service WxMpMaterialService) {
+	s.materialService = service
 }
 
 func (s *WxMpServiceImpl) GetWxMpConfig() WxMpConfig {

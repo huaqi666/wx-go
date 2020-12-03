@@ -23,6 +23,10 @@ func (e *Err) Error() string {
 	return errorMsg
 }
 
+//func (e *Err) IsSuccess() bool {
+//	return e.ErrCode == 0 && e.ErrMsg == ""
+//}
+
 // 自定义error
 type ErrMsg struct {
 	Err
@@ -59,6 +63,10 @@ type AccessToken struct {
 
 // ticket类型
 type TicketType string
+
+func (t TicketType) String() string {
+	return string(t)
+}
 
 const (
 	JSAPI  TicketType = "jsapi"
