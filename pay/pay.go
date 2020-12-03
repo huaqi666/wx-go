@@ -14,7 +14,11 @@ import (
 
 type WxPayService interface {
 	// 执行操作
+	// Deprecated: 使用新接口: Request
 	Do(url string, request WxPayRequest, res WxPayResult, useKey bool) error
+	// 执行http请求操作
+	Request(url string, request WxPayRequest, res WxPayResult, useKey bool) error
+
 	// 执行Post请求
 	Post(url, contentType string, data interface{}, args ...interface{}) ([]byte, error)
 	// Post 执行Post请求并将结果转成对象
@@ -44,7 +48,17 @@ type WxPayService interface {
 	   注意：订单生成后不能马上调用关单接口，最短调用时间间隔为5分钟。
 	   接口地址：https://api.mch.weixin.qq.com/pay/closeorder
 	   是否需要证书：   不需要。 */
+	// Deprecated: 使用新接口: CloseOrderByOutTradeNo
 	CloseOrderBy(string) (*WxPayOrderCloseResult, error)
+	/* 关闭订单.
+	   应用场景
+	   以下情况需要调用关单接口：
+	   1. 商户订单支付失败需要生成新单号重新发起支付，要对原订单号调用关单，避免重复支付；
+	   2. 系统下单后，用户支付超时，系统退出不再受理，避免用户继续，请调用关单接口。
+	   注意：订单生成后不能马上调用关单接口，最短调用时间间隔为5分钟。
+	   接口地址：https://api.mch.weixin.qq.com/pay/closeorder
+	   是否需要证书：   不需要。 */
+	CloseOrderByOutTradeNo(string) (*WxPayOrderCloseResult, error)
 	/* 关闭订单.
 	   应用场景
 	   以下情况需要调用关单接口：
@@ -294,6 +308,15 @@ func (p *WxPayV2ServiceImpl) CloseOrderBy(outTradeNo string) (*WxPayOrderCloseRe
 	})
 }
 
+func (p *WxPayV2ServiceImpl) CloseOrderByOutTradeNo(outTradeNo string) (*WxPayOrderCloseResult, error) {
+	if outTradeNo == "" {
+		return nil, common.ErrorOf("outTradeNo不能为空")
+	}
+	return p.CloseOrder(&WxPayOrderCloseRequest{
+		OutTradeNo: outTradeNo,
+	})
+}
+
 func (p *WxPayV2ServiceImpl) CloseOrder(request *WxPayOrderCloseRequest) (*WxPayOrderCloseResult, error) {
 	if request == nil || request.OutTradeNo == "" {
 		return nil, common.ErrorOf("outTradeNo不能为空")
@@ -438,6 +461,11 @@ func (p *WxPayV2ServiceImpl) Sign(params interface{}, st SignType, ignoreParams 
 
 // 操作
 func (p *WxPayV2ServiceImpl) Do(url string, request WxPayRequest, res WxPayResult, useKey bool) error {
+	return p.Request(url, request, res, useKey)
+}
+
+// 执行http请求操作
+func (p *WxPayV2ServiceImpl) Request(url string, request WxPayRequest, res WxPayResult, useKey bool) error {
 	request.CheckAndSign(p.GetWxPayConfig())
 
 	var err error

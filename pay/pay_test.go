@@ -57,7 +57,7 @@ func TestWxEntPayServiceImpl_QueryEnterpriseRedPack(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 	ser := service.GetEntPayService()
 
-	res, err := ser.QueryEntPay(&EntPayQueryRequest{})
+	res, err := ser.QueryEnterpriseRedPack(&EntPayRedPackQueryRequest{})
 	t.Log(res, err)
 }
 
@@ -73,7 +73,7 @@ func TestWxEntPayServiceImpl_QueryPayBankBy(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 	ser := service.GetEntPayService()
 
-	res, err := ser.QueryEntPay(&EntPayQueryRequest{})
+	res, err := ser.QueryEntPayBy("")
 	t.Log(res, err)
 }
 
@@ -81,15 +81,7 @@ func TestWxEntPayServiceImpl_SendEnterpriseRedPack(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 	ser := service.GetEntPayService()
 
-	res, err := ser.QueryEntPay(&EntPayQueryRequest{})
-	t.Log(res, err)
-}
-
-func TestWxEntPayServiceImpl_encryptRSA(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-	ser := service.GetEntPayService()
-
-	res, err := ser.QueryEntPay(&EntPayQueryRequest{})
+	res, err := ser.SendEnterpriseRedPack(&EntPayRedPackRequest{})
 	t.Log(res, err)
 }
 
@@ -103,84 +95,42 @@ func TestWxPayV2ServiceImpl_CloseOrder(t *testing.T) {
 func TestWxPayV2ServiceImpl_CloseOrderBy(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_Do(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_GetEntPayService(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.CloseOrderBy("")
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_GetPayBaseUr(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
+	res := service.GetPayBaseUr()
+	t.Log(res)
 }
 
 func TestWxPayV2ServiceImpl_GetSandboxSignKey(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_GetWxPayConfig(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.GetSandboxSignKey(&WxPayDefaultRequest{})
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_ParseOrderNotifyResult(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.ParseOrderNotifyResult("", HmacSha256)
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_ParseRefundNotifyResult(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.ParseRefundNotifyResult("")
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_ParseScanPayNotifyResult(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_Post(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_PostFor(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_PostKey(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.ParseScanPayNotifyResult("")
 	t.Log(res, err)
 }
 
@@ -194,50 +144,42 @@ func TestWxPayV2ServiceImpl_QueryOrder(t *testing.T) {
 func TestWxPayV2ServiceImpl_QueryOrderBy(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.QueryOrderBy("", "")
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_Refund(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.Refund(&WxPayRefundRequest{})
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_RefundQuery(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.RefundQuery(&WxPayRefundQueryRequest{})
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_RefundQueryV2(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.RefundQueryV2(&WxPayRefundQueryRequest{})
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_RefundV2(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
 
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
-	t.Log(res, err)
-}
-
-func TestWxPayV2ServiceImpl_Sign(t *testing.T) {
-	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-
-	res, err := service.CloseOrder(&WxPayOrderCloseRequest{})
+	res, err := service.RefundV2(&WxPayRefundRequest{})
 	t.Log(res, err)
 }
 
 func TestWxPayV2ServiceImpl_UnifyOrder(t *testing.T) {
 	service := NewWxPayServiceBy(config.AppId, config.MchId, config.MchKey, "http://www.xxx.cn/notify", "")
-	ser := service.GetEntPayService()
 
-	res, err := ser.QueryEntPay(&EntPayQueryRequest{})
+	res, err := service.UnifyOrder(&WxPayUnifiedOrderRequest{})
 	t.Log(res, err)
 }
 
