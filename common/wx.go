@@ -205,3 +205,10 @@ func (c *WxTicketImpl) IsTicketExpired(ticketType TicketType) bool {
 func (c *WxTicketImpl) ExpireTicket(ticketType TicketType) {
 	c.UpdateTicket(ticketType, nil)
 }
+
+func NewWxService(config WxConfig) WxService {
+	return &WxServiceImpl{
+		config: config,
+		http:   NewService(),
+	}
+}

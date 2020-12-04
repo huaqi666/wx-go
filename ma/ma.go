@@ -193,7 +193,7 @@ func NewWxMaService(config WxMaConfig) WxMaService {
 
 // 获取accessToken
 func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
-	return NewWxMaServiceBy(appId, secret).GetAccessToken()
+	return common.NewWxService(NewWxMaConfig(appId, secret)).GetAccessToken()
 }
 
 // 通过jsCode换取openid和sessionKey
@@ -214,9 +214,4 @@ func GetJsapiTicket(appId, secret string) (*common.Ticket, error) {
 // 获取ticket
 func GetTicket(appId, secret string, t common.TicketType) (*common.Ticket, error) {
 	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().GetTicket(t)
-}
-
-// 创建二维码
-func CreateWxaCodeUnlimited(appId, secret, scene, page string) ([]byte, error) {
-	return NewWxMaServiceBy(appId, secret).GetWxMaQrcodeService().CreateWxaCodeUnlimited(scene, page)
 }

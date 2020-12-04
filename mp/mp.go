@@ -140,7 +140,7 @@ func NewWxMpService(config WxMpConfig) WxMpService {
 
 // 获取accessToken
 func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
-	return NewWxMpServiceBy(appId, secret).GetAccessToken()
+	return common.NewWxService(NewWxMpConfig(appId, secret)).GetAccessToken()
 }
 
 // 创建调用jsapi时所需要的签名.
