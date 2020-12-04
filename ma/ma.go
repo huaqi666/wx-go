@@ -179,7 +179,7 @@ func (s *WxMaServiceImpl) SetWxMaConfig(config WxMaConfig) {
 }
 
 func NewWxMaServiceBy(appId, secret string) WxMaService {
-	return newWxMaService(newWxMaConfig(appId, secret))
+	return NewWxMaService(NewWxMaConfig(appId, secret))
 }
 
 func NewWxMaService(config WxMaConfig) WxMaService {

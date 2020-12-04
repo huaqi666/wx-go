@@ -126,7 +126,7 @@ func (s *WxMpServiceImpl) CreateJsapiSignature(url string) (*common.WxJsapiSigna
 }
 
 func NewWxMpServiceBy(appId, secret string) WxMpService {
-	return newWxMpService(newWxMpConfig(appId, secret))
+	return NewWxMpService(NewWxMpConfig(appId, secret))
 }
 
 func NewWxMpService(config WxMpConfig) WxMpService {

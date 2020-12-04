@@ -489,7 +489,7 @@ func (p *WxPayV2ServiceImpl) sign(params interface{}, ignoreParams ...string) st
 }
 
 func NewWxPayServiceBy(appId, mchId, mchKey, notifyUrl, keyPath string) WxPayService {
-	return newWxPayService(newWxPayV2Config(appId, mchId, mchKey, notifyUrl, keyPath))
+	return NewWxPayService(NewWxPayV2Config(appId, mchId, mchKey, notifyUrl, keyPath))
 }
 
 func NewWxPayService(config *WxPayConfig) WxPayService {

@@ -70,7 +70,7 @@ func (t TicketType) String() string {
 
 const (
 	JSAPI  TicketType = "jsapi"
-	SDK    TicketType = "2"
+	SDK    TicketType = "sdk"
 	WxCard TicketType = "wx_card"
 )
 
