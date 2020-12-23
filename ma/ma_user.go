@@ -8,7 +8,7 @@ import (
 
 type WxMaUserService interface {
 	// jsCode换取openid
-	GetSessionInfo(jsCode string) (*JsCode2SessionResult, error)
+	GetSessionInfo(jsCode string) (*WxMaJsCode2SessionResult, error)
 	// 解密用户敏感数据
 	GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error)
 	// 解密用户手机号信息.
@@ -31,7 +31,7 @@ func newWxMaUserService(service WxMaService) *WxMaUserServiceImpl {
 	}
 }
 
-func (u *WxMaUserServiceImpl) GetSessionInfo(jsCode string) (*JsCode2SessionResult, error) {
+func (u *WxMaUserServiceImpl) GetSessionInfo(jsCode string) (*WxMaJsCode2SessionResult, error) {
 	return u.service.JsCode2SessionInfo(jsCode)
 }
 

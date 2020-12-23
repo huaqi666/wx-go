@@ -2,6 +2,7 @@ package ma
 
 import "github.com/cliod/wx-go/common"
 
+// 直播间信息
 type WxLiveCreateRoomRequest struct {
 	RoomInfoBase
 	/* 主播副号微信号
@@ -16,6 +17,7 @@ type WxLiveCreateRoomRequest struct {
 
 type WxLiveCreateRoomResult struct {
 	common.Err
+	// 直播间id
 	RoomId uint64 `json:"roomId"`
 	// "小程序直播" 小程序码, 当主播微信号没有在 “小程序直播“ 小程序实名认证 返回该字段
 	QrcodeUrl string `json:"qrcode_url"`
@@ -27,18 +29,70 @@ type WxLiveEditRoomRequest struct {
 	Id uint64 `json:"id"`
 }
 
+// 编辑结果
 type WxLiveEditRoomResult struct {
 	common.Err
 }
 
-// 直播信息
+// 删除结果
+type WxLiveDeleteRoomResult struct {
+	common.Err
+}
+
+// 删除结果
+type WxLiveGetPushUrlResult struct {
+	common.Err
+
+	// 地址
+	PushAddr string `json:"pushAddr"`
+}
+
+// 删除结果
+type WxLiveGetSharedUrlResult struct {
+	common.Err
+
+	// 地址
+	CdnUrl string `json:"cdnUrl"`
+}
+
+// 直播信息-直播间操作返回结果
 type WxMaLiveResult struct {
 	common.Err
 
-	Total      uint64                     `json:"total"`
-	AuditId    uint64                     `json:"auditId"`
-	GoodsId    uint64                     `json:"goodsId"`
-	Goods      []*WxMaLiveGoodsResult     `json:"goods"`
-	RoomInfos  []*WxMaLiveRoomInfosResult `json:"room_info"`
-	LiveReplay []*WxMaLiveReplayResult    `json:"live_replay"`
+	Total   uint64 `json:"total"`
+	AuditId uint64 `json:"auditId"`
+	GoodsId uint64 `json:"goodsId"`
+	// 商品列表
+	Goods []*WxMaLiveGoodsResult `json:"goods"`
+	// 直播间列表
+	RoomInfos []*WxMaLiveRoomInfosResult `json:"room_info"`
+	// 获取回放源视频列表
+	LiveReplay []*WxMaLiveReplayResult `json:"live_replay"`
+}
+
+// 直播间小助手用户信息
+type WxMaLiveAssistantInfo struct {
+	Timestamp uint64 `json:"timestamp"` // 修改时间
+	HeadImg   string `json:"headimg"`   // 头像
+	Username  string `json:"username"`  // 用户微信号
+	Nickname  string `json:"nickname"`  // 用户昵称
+	Alias     string `json:"alias"`     // 微信号
+	Openid    string `json:"openid"`    // openid
+}
+
+// 直播间小助手用户信息
+type WxMaAssistantResult struct {
+	common.Err
+
+	Count    uint64           `json:"count"`
+	MaxCount uint64           `json:"maxCount"`
+	List     []*WxMaAssistant `json:"list"`
+}
+
+type WxMaAssistant struct {
+	Timestamp uint64 `json:"timestamp"` // 修改时间
+	HeadImg   string `json:"headimg"`   // 头像
+	Nickname  string `json:"nickname"`  // 用户昵称
+	Alias     string `json:"alias"`     // 微信号
+	Openid    string `json:"openid"`    // openid
 }

@@ -38,10 +38,13 @@ const (
 	MaUpdatableMsgSendUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/updatablemsg/send" + ApiSuffix
 	MaActivityIdCreateUrl = ApiDefaultHostUrl + "/cgi-bin/message/wxopen/activityid/create" + ApiSuffix
 
-	MaCreateRoom  = ApiDefaultHostUrl + "/wxaapi/broadcast/room/create" + ApiSuffix
-	MaEditRoom    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/editroom" + ApiSuffix
-	MaGetLiveInfo = ApiDefaultHostUrl + "/wxa/business/getliveinfo" + ApiSuffix
-	MaAddGoods    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/addgoods" + ApiSuffix
+	MaCreateRoom    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/create" + ApiSuffix
+	MaEditRoom      = ApiDefaultHostUrl + "/wxaapi/broadcast/room/editroom" + ApiSuffix
+	MaDeleteRoom    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/deleteroom" + ApiSuffix
+	MaGetPushUrl    = ApiDefaultHostUrl + "/wxaapi/broadcast/room/getpushurl" + ApiSuffix + "&roomId=%s"
+	MaGetSharedCode = ApiDefaultHostUrl + "/wxaapi/broadcast/room/getsharedcode" + ApiSuffix + "&roomId=%s&params=%s"
+	MaGetLiveInfo   = ApiDefaultHostUrl + "/wxa/business/getliveinfo" + ApiSuffix
+	MaAddGoods      = ApiDefaultHostUrl + "/wxaapi/broadcast/room/addgoods" + ApiSuffix
 )
 
 // mp

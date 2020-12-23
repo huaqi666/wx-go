@@ -14,7 +14,7 @@ type WxMaService interface {
 	SetWxMaConfig(WxMaConfig)
 
 	// jsCode换取openid
-	JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error)
+	JsCode2SessionInfo(jsCode string) (*WxMaJsCode2SessionResult, error)
 	// 验证消息的确来自微信服务器
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319&token=&lang=zh_CN
 	CheckSignature(timestamp, nonce, signature string) bool
@@ -81,8 +81,8 @@ func newWxMaService(config WxMaConfig) *WxMaServiceImpl {
 	return impl
 }
 
-func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*JsCode2SessionResult, error) {
-	var jsr JsCode2SessionResult
+func (s *WxMaServiceImpl) JsCode2SessionInfo(jsCode string) (*WxMaJsCode2SessionResult, error) {
+	var jsr WxMaJsCode2SessionResult
 	err := s.GetFor(&jsr, common.MaSessionInfoUrl, s.config.GetAppID(), s.config.GetSecret(), jsCode)
 	return &jsr, err
 }
@@ -197,7 +197,7 @@ func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
 }
 
 // 通过jsCode换取openid和sessionKey
-func JsCode2SessionInfo(appId, secret, jsCode string) (*JsCode2SessionResult, error) {
+func JsCode2SessionInfo(appId, secret, jsCode string) (*WxMaJsCode2SessionResult, error) {
 	return NewWxMaServiceBy(appId, secret).JsCode2SessionInfo(jsCode)
 }
 
