@@ -138,12 +138,12 @@ func NewWxMpService(config WxMpConfig) WxMpService {
 
 // 将方法静态方便使用
 
-// 获取accessToken
+// GetAccessToken get accessToken
 func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
 	return common.NewWxService(NewWxMpConfig(appId, secret)).GetAccessToken()
 }
 
-// 创建调用jsapi时所需要的签名.
+// CreateJsapiSignatureBy 创建调用jsapi时所需要的签名.
 func CreateJsapiSignatureBy(appId, secret, url string) (*common.WxJsapiSignature, error) {
 	return NewWxMpServiceBy(appId, secret).CreateJsapiSignature(url)
 }

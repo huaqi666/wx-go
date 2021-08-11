@@ -8,7 +8,7 @@ import (
 	"errors"
 )
 
-// Rsa加密
+// RsaEncrypt Rsa加密
 func RsaEncrypt(data []byte, publicKey []byte) ([]byte, error) {
 	//解密pem格式的公钥
 	block, _ := pem.Decode(publicKey)

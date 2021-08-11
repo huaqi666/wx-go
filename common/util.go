@@ -7,7 +7,7 @@ import (
 )
 
 func CreateJsapiSignature(url, appId, ticket string) (*WxJsapiSignature, error) {
-	timestamp := strconv.Itoa(time.Now().Second())
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	randomStr := util.RandSeq(16)
 	arr := []string{"jsapi_ticket=" + ticket, "noncestr=" + randomStr, "timestamp=" + timestamp, "url=" + url}
 	signature, err := util.GenWithAmple(arr)

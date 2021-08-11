@@ -1,27 +1,23 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 )
 
-// map构建xml字符串
-// Deprecated: Xml.ToXmlString
-func BuildByMap(data map[string]interface{}) string {
+// ToXmlString map构建xml字符串
+func ToXmlString(data map[string]interface{}) string {
 	return NewXml(data).String()
 }
 
 type Xml map[string]interface{}
 
 func (x Xml) String() string {
-	return x.ToString()
+	return x.toXmlString()
 }
 
-func (x Xml) ToString() string {
-	return x.ToXmlString()
-}
-
-func (x Xml) ToXmlString() string {
+func (x Xml) toXmlString() string {
 	s := "<xml>"
 	for k, v := range x {
 		s += "<" + k + ">" + v.(string) + "</" + k + ">"
@@ -30,7 +26,7 @@ func (x Xml) ToXmlString() string {
 	return s
 }
 
-// map to xml
+// NewXml map to xml
 func NewXml(data map[string]interface{}) Xml {
 	if data == nil {
 		return Xml{}
@@ -50,12 +46,12 @@ func NewXml(data map[string]interface{}) Xml {
 			res[k] = v
 			continue
 		}
-		//isStruct := t.Kind() == reflect.Struct || t.Elem().Kind() == reflect.Struct
-		//if isStruct {
-		//	bs, _ := json.Marshal(v)
-		//	res[k] = string(bs)
-		//	continue
-		//}
+		isStruct := t.Kind() == reflect.Struct || t.Elem().Kind() == reflect.Struct
+		if isStruct {
+			bs, _ := json.Marshal(v)
+			res[k] = string(bs)
+			continue
+		}
 		res[k] = fmt.Sprint(v)
 	}
 	return res

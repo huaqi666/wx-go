@@ -9,7 +9,7 @@ import (
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
-// 获取长度n的随机字符串
+// RandSeq 获取长度n的随机字符串
 func RandSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
@@ -18,7 +18,7 @@ func RandSeq(n int) string {
 	return string(b)
 }
 
-// 是否为空
+// IsAnyEmpty values是否有为空的
 func IsAnyEmpty(values ...string) bool {
 	for _, v := range values {
 		if strings.Trim(v, " ") == "" {
@@ -35,7 +35,7 @@ func Md5(str string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// 转大写
+// TrimToUpper 字符串去掉两端空格并转大写
 func TrimToUpper(str string) string {
 	return strings.ToUpper(strings.Trim(str, " "))
 }

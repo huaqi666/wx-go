@@ -6,60 +6,62 @@ import (
 	"time"
 )
 
-// 配置的接口
+// WxConfig 微信配置
 type WxConfig interface {
-	// 获取appId
+	// GetAppID 获取appId
 	GetAppID() string
-	// 获取密钥
+	// GetSecret 获取密钥
 	GetSecret() string
 
-	// 获取access_token
+	// GetAccessToken 获取access_token
 	GetAccessToken() *AccessToken
-	// 设置access_token
+	// SetAccessToken 设置access_token
 	SetAccessToken(*AccessToken)
 
-	// 获取Ticket
+	// GetWxTicket 获取Ticket
 	GetWxTicket() WxTicket
 }
 
-// access_token接口
+// WxAccessToken API授权
 type WxAccessToken interface {
-	// 获取access_token
+	// GetAccessToken 获取access_token
 	GetAccessToken() (*AccessToken, error)
-	// access_token是否过期, ture：是
+	// IsAccessTokenExpired access_token是否过期, ture：是
 	IsAccessTokenExpired() bool
-	// 强制过期access_token
+	// ExpireAccessToken 强制过期access_token
 	ExpireAccessToken()
 }
 
 type WxTicket interface {
-	// 获取Ticket
+	// GetTicket 获取Ticket
 	GetTicket(TicketType) *Ticket
-	// 更新Ticket
+	// UpdateTicket 更新Ticket
 	UpdateTicket(TicketType, *Ticket)
-	// Ticket是否过期
+	// IsTicketExpired Ticket是否过期
 	IsTicketExpired(TicketType) bool
-	// 直接过期Ticket
+	// ExpireTicket 直接过期Ticket
 	ExpireTicket(TicketType)
 }
 
 type WxJsapi interface {
-	// 获得jsapi_ticket,不强制刷新jsapi_ticket.
+	// GetJsapiTicket 获得jsapi_ticket,不强制刷新jsapi_ticket.
 	GetJsapiTicket() (*Ticket, error)
+	// ForceGetJsapiTicket
 	/* 获得jsapi_ticket.
 	   获得时会检查jsapiToken是否过期，如果过期了，那么就刷新一下，否则就什么都不干
 	   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN */
 	ForceGetJsapiTicket(bool) (*Ticket, error)
-	// 获得ticket,不强制刷新ticket.
+	// GetTicket 获得ticket,不强制刷新ticket.
 	GetTicket(TicketType) (*Ticket, error)
-	// 获得时会检查 Token是否过期，如果过期了，那么就刷新一下，否则就什么都不干
+	// ForceGetTicket 获得时会检查 Token是否过期，如果过期了，那么就刷新一下，否则就什么都不干
 	ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error)
+	// CreateJsapiSignature
 	/* 创建调用jsapi时所需要的签名.
 	   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN */
 	CreateJsapiSignature(url string) (*WxJsapiSignature, error)
 }
 
-// wxAPI，获取accessToken，配置管理
+// WxService wxAPI，获取accessToken，配置管理
 type WxService interface {
 	Service
 	// 获取access_token

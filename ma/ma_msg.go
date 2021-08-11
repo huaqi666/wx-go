@@ -58,7 +58,7 @@ func (m *WxMaMsgServiceImpl) CreateUpdatableMessageActivityId() ([]byte, error) 
 }
 
 func (m *WxMaMsgServiceImpl) Send(url string, msg interface{}) error {
-	var res common.Err
+	var res common.WxCommonErr
 	err := m.service.PostFor(&res, url, common.PostJsonContentType, msg)
 	if err != nil {
 		return err

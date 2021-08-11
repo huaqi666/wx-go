@@ -4,32 +4,32 @@ import "github.com/cliod/wx-go/common"
 
 // 订阅的公共模板
 type WxMaPubTemplateTitleListResult struct {
-	common.Err
+	common.WxCommonErr
 	Count uint64          `json:"count"`
 	Data  []*TemplateItem `json:"data"`
 }
 
 // 模板标题下关键词库结果
 type WxMaPubTemplateKeywordListResult struct {
-	common.Err
+	common.WxCommonErr
 	Count uint64                `json:"count"`
 	Data  []*PubTemplateKeyword `json:"data"`
 }
 
 // 个人模板结果
 type WxMaTemplateListResult struct {
-	common.Err
+	common.WxCommonErr
 	Data []*TemplateInfo `json:"data"`
 }
 
 // 类目
 type WxMaCategoryListResult struct {
-	common.Err
+	common.WxCommonErr
 	Data []*CategoryData `json:"data"`
 }
 
 type WxMaAddTemplateResult struct {
-	common.Err
+	common.WxCommonErr
 	PriTmplId string `json:"pri_tmpl_id"`
 }
 

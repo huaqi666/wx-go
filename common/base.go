@@ -6,39 +6,53 @@ import (
 	"time"
 )
 
-// 公共接口返回错误
-type Err struct {
-	ErrCode uint64 `json:"errcode"`
-	ErrMsg  string `json:"errmsg"`
+// WechatResponse 微信API响应
+type WechatResponse interface {
+	ErrMsg() string
+	HasErrOccurred() bool
 }
 
-func (e *Err) Error() string {
+type WxBaseResponse struct {
+	Errcode int    `json:"errcode,omitempty"`
+	Errmsg  string `json:"errmsg,omitempty"`
+}
+
+func (e *WxBaseResponse) ErrMsg() string {
+	return e.Errmsg
+}
+
+func (e *WxBaseResponse) HasErrOccurred() bool {
+	return e.Errcode != 0
+}
+
+// WxCommonErr 公共接口返回错误
+type WxCommonErr struct {
+	WxBaseResponse
+}
+
+func (e *WxCommonErr) Error() string {
 	var errorMsg string
-	if msg := e.ErrCode; msg != 0 {
+	if msg := e.Errcode; msg != 0 {
 		errorMsg = fmt.Sprintf("错误代码：%d", msg)
 	}
-	if msg := util.TrimToUpper(e.ErrMsg); msg != "" {
+	if msg := util.TrimToUpper(e.Errmsg); msg != "" {
 		errorMsg += "，错误信息：" + msg
 	}
 	return errorMsg
 }
 
-//func (e *Err) IsSuccess() bool {
-//	return e.ErrCode == 0 && e.ErrMsg == ""
-//}
-
-// 自定义error
-type ErrMsg struct {
-	Err
+// WxPayErrMsg 自定义error
+type WxPayErrMsg struct {
+	WxCommonErr
 	Msg string `json:"msg"`
 }
 
-func (e *ErrMsg) Error() string {
+func (e *WxPayErrMsg) Error() string {
 	var errorMsg string
-	if msg := e.ErrCode; msg != 0 {
+	if msg := e.Errcode; msg != 0 {
 		errorMsg = fmt.Sprintf("错误代码：%d", msg)
 	}
-	if msg := util.TrimToUpper(e.ErrMsg); msg != "" {
+	if msg := util.TrimToUpper(e.Errmsg); msg != "" {
 		errorMsg += "，错误信息：" + msg
 	}
 	if msg := util.TrimToUpper(e.Msg); msg != "" {
@@ -47,21 +61,21 @@ func (e *ErrMsg) Error() string {
 	return errorMsg
 }
 
-func ErrorOf(msg string, params ...interface{}) *ErrMsg {
-	return &ErrMsg{
+func ErrorOf(msg string, params ...interface{}) *WxPayErrMsg {
+	return &WxPayErrMsg{
 		Msg: fmt.Sprintf(msg, params...),
 	}
 }
 
-//小程序access_token
+// AccessToken 小程序access_token
 type AccessToken struct {
-	Err
+	WxCommonErr
 	AccessToken string    `json:"access_token"`
 	ExpiresIn   uint64    `json:"expires_in"`
 	Time        time.Time `json:"time"`
 }
 
-// ticket类型
+// TicketType ticket类型
 type TicketType string
 
 func (t TicketType) String() string {
@@ -74,16 +88,16 @@ const (
 	WxCard TicketType = "wx_card"
 )
 
-// 授权页ticket
+// Ticket 授权页ticket
 type Ticket struct {
-	Err
+	WxCommonErr
 	Ticket    string    `json:"ticket"`
 	ExpiresIn uint64    `json:"expires_in"`
 	Time      time.Time `json:"time"`
 	Type      string    `json:"type"`
 }
 
-// jspai signature.
+// WxJsapiSignature jsapi signature.
 type WxJsapiSignature struct {
 	AppId     string `json:"app_id"`
 	NonceStr  string `json:"nonce_str"`

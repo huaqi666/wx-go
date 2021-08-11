@@ -90,7 +90,7 @@ func (i *WxMaSubscribeServiceImpl) DelTemplate(templateId string) error {
 		"priTmplId": templateId,
 	}
 
-	var res common.Err
+	var res common.WxCommonErr
 	err := i.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err

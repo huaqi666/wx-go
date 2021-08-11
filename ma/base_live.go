@@ -16,7 +16,7 @@ type WxLiveCreateRoomRequest struct {
 }
 
 type WxLiveCreateRoomResult struct {
-	common.Err
+	common.WxCommonErr
 	// 直播间id
 	RoomId uint64 `json:"roomId"`
 	// "小程序直播" 小程序码, 当主播微信号没有在 “小程序直播“ 小程序实名认证 返回该字段
@@ -31,17 +31,17 @@ type WxLiveEditRoomRequest struct {
 
 // 编辑结果
 type WxLiveEditRoomResult struct {
-	common.Err
+	common.WxCommonErr
 }
 
 // 删除结果
 type WxLiveDeleteRoomResult struct {
-	common.Err
+	common.WxCommonErr
 }
 
 // 删除结果
 type WxLiveGetPushUrlResult struct {
-	common.Err
+	common.WxCommonErr
 
 	// 地址
 	PushAddr string `json:"pushAddr"`
@@ -49,7 +49,7 @@ type WxLiveGetPushUrlResult struct {
 
 // 删除结果
 type WxLiveGetSharedUrlResult struct {
-	common.Err
+	common.WxCommonErr
 
 	// 地址
 	CdnUrl string `json:"cdnUrl"`
@@ -57,7 +57,7 @@ type WxLiveGetSharedUrlResult struct {
 
 // 直播信息-直播间操作返回结果
 type WxMaLiveResult struct {
-	common.Err
+	common.WxCommonErr
 
 	Total   uint64 `json:"total"`
 	AuditId uint64 `json:"auditId"`
@@ -82,7 +82,7 @@ type WxMaLiveAssistantInfo struct {
 
 // 直播间小助手用户信息
 type WxMaAssistantResult struct {
-	common.Err
+	common.WxCommonErr
 
 	Count    uint64           `json:"count"`
 	MaxCount uint64           `json:"maxCount"`

@@ -11,20 +11,20 @@ import (
 	"reflect"
 )
 
-// http请求接口
+// Service http请求接口
 type Service interface {
-	// 执行Get请求
+	// Get 执行Get请求
 	Get(url string, args ...interface{}) ([]byte, error)
-	// 执行Post请求
+	// Post 执行Post请求
 	Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error)
 
-	// Get 执行Get请求并将结果转成对象
+	// GetFor 执行Get请求并将结果转成对象
 	GetFor(v interface{}, url string, args ...interface{}) error
-	// Post 执行Post请求并将结果转成对象
+	// PostFor 执行Post请求并将结果转成对象
 	PostFor(v interface{}, url string, contentType string, data interface{}, args ...interface{}) error
 }
 
-// http请求默认实现(json传参)
+// ServiceImpl http请求默认实现(json传参)
 type ServiceImpl struct {
 	client *http.Client
 }
@@ -64,7 +64,7 @@ func (s *ServiceImpl) PostFor(v interface{}, url string, contentType string, dat
 	return json.Unmarshal(res, v)
 }
 
-// http请求默认实现(xml传参)
+// XmlServiceImpl http请求默认实现(xml传参)
 type XmlServiceImpl struct {
 	client *http.Client
 }
@@ -82,7 +82,7 @@ func (s *XmlServiceImpl) Post(url string, contentType string, data interface{}, 
 	uri := fmt.Sprintf(url, args...)
 	var body []byte
 	if reflect.ValueOf(data).Kind() == reflect.Map {
-		s := util.BuildByMap(data.(map[string]interface{}))
+		s := util.ToXmlString(data.(map[string]interface{}))
 		body = []byte(s)
 	} else {
 		b, err := xml.Marshal(data)

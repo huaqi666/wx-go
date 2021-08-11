@@ -3,30 +3,30 @@ package mp
 import "github.com/cliod/wx-go/common"
 
 type WxMpUserService interface {
-	// 设置用户备注名
+	// UserUpdateRemark 设置用户备注名
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140838&token=&lang=zh_CN
 	UserUpdateRemark(openid, remark string) error
 
-	// 获取用户基本信息（语言为默认的zh_CN 简体）
+	// GetUserInfo 获取用户基本信息（语言为默认的zh_CN 简体）
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839&token=&lang=zh_CN
 	GetUserInfo(openid string) (*WxMpUser, error)
-	// 获取用户基本信息指定语言
+	// GetUserInfoBy 获取用户基本信息指定语言
 	GetUserInfoBy(openid, lang string) (*WxMpUser, error)
 
-	// 获取用户基本信息列表
+	// GetUserInfoList 获取用户基本信息列表
 	// 开发者可通过该接口来批量获取用户基本信息。最多支持一次拉取100条。
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839&token=&lang=zh_CN
 	GetUserInfoList(openidArr ...string) ([]*WxMpUser, error)
-	// 获取用户基本信息列表指定语言
+	// GetUserInfoListBy 获取用户基本信息列表指定语言
 	GetUserInfoListBy([]*WxMpUserQueryParam) ([]*WxMpUser, error)
 
-	// 获取用户列表
+	// GetUserList 获取用户列表
 	// 公众号可通过本接口来获取帐号的关注者列表，
 	// 关注者列表由一串OpenID（加密后的微信号，每个用户对每个公众号的OpenID是唯一的）组成。
 	// 一次拉取调用最多拉取10000个关注者的OpenID，可以通过多次拉取的方式来满足需求。
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140840&token=&lang=zh_CN
 	GetUserList(nextOpenid string) (*WxMpUserList, error)
-	// 微信公众号主体变更迁移用户 openid
+	// ChangeOpenid 微信公众号主体变更迁移用户 openid
 	// 详情请见: http://kf.qq.com/faq/170221aUnmmU170221eUZJNf.html, http://kf.qq.com/faq/1901177NrqMr190117nqYJze.html
 	// fromAppId: 原公众号的
 	// 一次最多100个

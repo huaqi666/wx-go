@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// 组装url参数并签名
+// GenWithAmple 组装url参数并签名
 func GenWithAmple(arr []string) (string, error) {
 	if IsAnyEmpty(arr...) {
 		return "", fmt.Errorf("非法请求参数，有部分参数为空")
@@ -27,7 +27,7 @@ func GenWithAmple(arr []string) (string, error) {
 	return strings.ToLower(hex.EncodeToString(sum[:])), nil
 }
 
-// 组装url参数并签名
+// Gen 组装url参数并签名
 func Gen(arr []string) (string, error) {
 	if IsAnyEmpty(arr...) {
 		return "", fmt.Errorf("非法请求参数，有部分参数为空")

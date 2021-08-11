@@ -122,7 +122,7 @@ func (r *BaseWxPayRequest) IgnoredParamsForSign() []string {
 type BaseWxPayResult struct {
 	XMLName xml.Name `xml:"xml" json:"-"`
 
-	common.Err
+	common.WxCommonErr
 	ResultCode string `json:"result_code" xml:"result_code"`
 	RetMsg     string `json:"retmsg" xml:"retmsg"`
 

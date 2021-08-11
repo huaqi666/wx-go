@@ -157,7 +157,7 @@ func (live *WxMaLiveServiceImpl) AddGoodsToRoom(roomId uint64, goodsIds []uint64
 	}
 
 	url := common.MaAddGoods
-	var res common.Err
+	var res common.WxCommonErr
 	err := live.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err
@@ -188,7 +188,7 @@ func (live *WxMaLiveServiceImpl) AddAssistant(roomId uint64, users []WxMaLiveAss
 	}
 
 	url := common.MaAddGoods
-	var res common.Err
+	var res common.WxCommonErr
 	err := live.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err
@@ -205,7 +205,7 @@ func (live *WxMaLiveServiceImpl) ModifyAssistant(roomId uint64, username, nickna
 	}
 
 	url := common.MaAddGoods
-	var res common.Err
+	var res common.WxCommonErr
 	err := live.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err
@@ -232,7 +232,7 @@ func (live *WxMaLiveServiceImpl) RemoveAssistant(roomId uint64, username string)
 	}
 
 	url := common.MaAddGoods
-	var res common.Err
+	var res common.WxCommonErr
 	err := live.service.PostFor(&res, url, common.PostJsonContentType, param)
 	if err != nil {
 		return err

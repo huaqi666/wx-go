@@ -2,15 +2,14 @@ package util
 
 import (
 	"bytes"
-	"errors"
+	"github.com/cliod/wx-go/common/err"
 )
 
-const pkcs7BlockSize = 32
-
-var (
-	ErrInvalidBlockSize    = errors.New("invalid block size")
-	ErrInvalidPKCS7Data    = errors.New("invalid PKCS7 data")
-	ErrInvalidPKCS7Padding = errors.New("invalid padding on input")
+const (
+	pkcs7BlockSize         = 32
+	ErrInvalidBlockSize    = err.WxErr("invalid block size")
+	ErrInvalidPKCS7Data    = err.WxErr("invalid PKCS7 data")
+	ErrInvalidPKCS7Padding = err.WxErr("invalid padding on input")
 )
 
 // pkcs7encode 对需要加密的明文进行填充补位
@@ -44,7 +43,7 @@ func pkcs7decode(plaintext []byte) []byte {
 	return plaintext[:(ln - pad)]
 }
 
-// 解压
+// Pkcs7Unpacked 解压
 // pkcs7Unpacked returns slice of the original data without padding
 func Pkcs7Unpacked(data []byte, blockSize int) ([]byte, error) {
 	if blockSize <= 0 {

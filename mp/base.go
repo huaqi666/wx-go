@@ -28,7 +28,7 @@ const (
 	VIDEO MaterialType = "video"
 )
 
-// 二维码ticket
+// WxMpQrCodeTicket 二维码ticket
 type WxMpQrCodeTicket struct {
 	Ticket        string `json:"ticket"`
 	ExpireSeconds int    `json:"expire_seconds"` // 如果为-1，说明是永久
@@ -36,7 +36,7 @@ type WxMpQrCodeTicket struct {
 }
 
 type WxMpMaterialNewsBatchGetResult struct {
-	common.Err
+	common.WxCommonErr
 
 	TotalCount uint64                            `json:"total_count"`
 	ItemCount  uint64                            `json:"item_count"`
@@ -44,7 +44,7 @@ type WxMpMaterialNewsBatchGetResult struct {
 }
 
 type WxMpMaterialFileBatchGetResult struct {
-	common.Err
+	common.WxCommonErr
 
 	TotalCount uint64                            `json:"total_count"`
 	ItemCount  uint64                            `json:"item_count"`

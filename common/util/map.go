@@ -2,7 +2,7 @@ package util
 
 import "encoding/json"
 
-// 结构体转map[string]interface{}
+// ToMap 结构体转map[string]interface{}
 func ToMap(request interface{}) map[string]interface{} {
 	b, err := json.Marshal(request)
 	if err != nil {
