@@ -59,7 +59,7 @@ const (
 	MpUserInfoBatchGetUrl = ApiDefaultHostUrl + "/cgi-bin/user/info/batchget" + ApiSuffix
 	MpUserChangeOpenidUrl = ApiDefaultHostUrl + "/cgi-bin/changeopenid"
 
-	MpMaterialBatchgetUrl = ApiDefaultHostUrl + "/cgi-bin/material/batchget_material" + ApiSuffix
+	MpMaterialBatchGetUrl = ApiDefaultHostUrl + "/cgi-bin/material/batchget_material" + ApiSuffix
 )
 
 // pay

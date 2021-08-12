@@ -3,32 +3,31 @@ package mp
 
 import (
 	"github.com/cliod/wx-go/common"
-	"github.com/cliod/wx-go/common/util"
 )
 
 type WxMpService interface {
 	common.WxService
 	common.WxJsapi
 
-	// 获取配置
+	// GetWxMpConfig 获取配置
 	GetWxMpConfig() WxMpConfig
-	// 设置配置
+	// SetWxMpConfig 设置配置
 	SetWxMpConfig(WxMpConfig)
 
-	// 验证消息的确来自微信服务器
+	// CheckSignature 验证消息的确来自微信服务器
 	CheckSignature(timestamp, nonce, signature string) bool
 
-	// 获取用户接口
+	// GetWxMpUserService 获取用户接口
 	GetWxMpUserService() WxMpUserService
-	// 获取二维码接口
+	// GetWxMpQrcodeService 获取二维码接口
 	GetWxMpQrcodeService() WxMpQrcodeService
-	// 获取素材接口
+	// GetWxMpMaterialService 获取素材接口
 	GetWxMpMaterialService() WxMpMaterialService
-	// 设置(用户自定义的)用户接口
+	// SetWxMpUserService 设置(用户自定义的)用户接口
 	SetWxMpUserService(WxMpUserService)
-	// 设置(用户自定义的)二维码接口
+	// SetWxMpQrcodeService 设置(用户自定义的)二维码接口
 	SetWxMpQrcodeService(WxMpQrcodeService)
-	// 设置(用户自定义)素材接口
+	// SetWxMpMaterialService 设置(用户自定义)素材接口
 	SetWxMpMaterialService(service WxMpMaterialService)
 }
 
@@ -52,7 +51,7 @@ func newWxMpService(config WxMpConfig) *WxMpServiceImpl {
 }
 
 func (s *WxMpServiceImpl) CheckSignature(timestamp, nonce, signature string) bool {
-	return util.CheckSignature(s.GetWxMpConfig().GetToken(), timestamp, nonce, signature)
+	return CheckSignature(s.GetWxMpConfig().GetToken(), timestamp, nonce, signature)
 }
 
 func (s *WxMpServiceImpl) GetWxMpUserService() WxMpUserService {
@@ -122,10 +121,10 @@ func (s *WxMpServiceImpl) getTicket(ticketType common.TicketType) (*common.Ticke
 func (s *WxMpServiceImpl) CreateJsapiSignature(url string) (*common.WxJsapiSignature, error) {
 	jsapiTicket, _ := s.GetJsapiTicket()
 	appId := s.GetWxMpConfig().GetAppID()
-	return common.CreateJsapiSignature(url, appId, jsapiTicket.Ticket)
+	return CreateJsapiSignature(url, appId, jsapiTicket.Ticket)
 }
 
-func NewWxMpServiceBy(appId, secret string) WxMpService {
+func NewWxMpServiceWith(appId, secret string) WxMpService {
 	return NewWxMpService(NewWxMpConfig(appId, secret))
 }
 
@@ -143,7 +142,7 @@ func GetAccessToken(appId, secret string) (*common.AccessToken, error) {
 	return common.NewWxService(NewWxMpConfig(appId, secret)).GetAccessToken()
 }
 
-// CreateJsapiSignatureBy 创建调用jsapi时所需要的签名.
-func CreateJsapiSignatureBy(appId, secret, url string) (*common.WxJsapiSignature, error) {
-	return NewWxMpServiceBy(appId, secret).CreateJsapiSignature(url)
+// CreateJsapiSignatureOnce 创建调用jsapi时所需要的签名.
+func CreateJsapiSignatureOnce(appId, secret, url string) (*common.WxJsapiSignature, error) {
+	return NewWxMpServiceWith(appId, secret).CreateJsapiSignature(url)
 }

@@ -12,12 +12,12 @@ type WxMaUserService interface {
 	// 解密用户敏感数据
 	GetUserInfo(sessionKey, encryptedData, ivStr string) (*UserInfo, error)
 	// 解密用户手机号信息.
-	GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error)
+	GetPhoneInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error)
 	// 验证用户信息完整性
 	CheckUserInfo(sessionKey, rawData, signature string) bool
-	/* 上报用户数据后台接口.
-	   小游戏可以通过本接口上报key-value数据到用户的CloudStorage。
-	   文档参考https://developers.weixin.qq.com/minigame/dev/document/open-api/data/setUserStorage.html */
+	// SetUserStorage 上报用户数据后台接口.
+	//   小游戏可以通过本接口上报key-value数据到用户的CloudStorage。
+	//   文档参考https://developers.weixin.qq.com/minigame/dev/document/open-api/data/setUserStorage.html */
 	SetUserStorage(kvMap map[string]string, sessionKey, openid string) error
 }
 
@@ -39,7 +39,7 @@ func (u *WxMaUserServiceImpl) GetUserInfo(sessionKey, encryptedData, ivStr strin
 	return GetUserInfo(sessionKey, encryptedData, ivStr)
 }
 
-func (u *WxMaUserServiceImpl) GetPhoneNoInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
+func (u *WxMaUserServiceImpl) GetPhoneInfo(sessionKey, encryptedData, ivStr string) (*PhoneNumberInfo, error) {
 	return GetPhoneNoInfo(sessionKey, encryptedData, ivStr)
 }
 

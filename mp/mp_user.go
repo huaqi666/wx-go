@@ -1,6 +1,9 @@
 package mp
 
-import "github.com/cliod/wx-go/common"
+import (
+	"github.com/cliod/wx-go/common"
+	"strings"
+)
 
 type WxMpUserService interface {
 	// UserUpdateRemark 设置用户备注名
@@ -9,16 +12,14 @@ type WxMpUserService interface {
 
 	// GetUserInfo 获取用户基本信息（语言为默认的zh_CN 简体）
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839&token=&lang=zh_CN
-	GetUserInfo(openid string) (*WxMpUser, error)
-	// GetUserInfoBy 获取用户基本信息指定语言
-	GetUserInfoBy(openid, lang string) (*WxMpUser, error)
+	GetUserInfo(openid string, lang ...string) (*WxMpUser, error)
 
-	// GetUserInfoList 获取用户基本信息列表
+	// GetUserInfos 获取用户基本信息列表
 	// 开发者可通过该接口来批量获取用户基本信息。最多支持一次拉取100条。
 	// 详情请见: http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839&token=&lang=zh_CN
-	GetUserInfoList(openidArr ...string) ([]*WxMpUser, error)
-	// GetUserInfoListBy 获取用户基本信息列表指定语言
-	GetUserInfoListBy([]*WxMpUserQueryParam) ([]*WxMpUser, error)
+	GetUserInfos(openidArr ...string) ([]*WxMpUser, error)
+	// GetUserInfosWithQuery 获取用户基本信息列表指定语言
+	GetUserInfosWithQuery(WxMpUserQuery) ([]*WxMpUser, error)
 
 	// GetUserList 获取用户列表
 	// 公众号可通过本接口来获取帐号的关注者列表，
@@ -33,7 +34,7 @@ type WxMpUserService interface {
 	ChangeOpenid(fromAppId string, openidArr ...string) ([]*WxMpChangeOpenid, error)
 }
 
-// 微信用户信息
+// WxMpUser 微信用户信息
 type WxMpUser struct {
 	Subscribe bool   `json:"subscribe"`
 	OpenId    string `json:"open_id"`
@@ -74,14 +75,21 @@ type WxMpUserQueryParam struct {
 	Lang   string `json:"lang"`
 }
 
-func GetWxMpUserQueryParam(openidArr ...string) []*WxMpUserQueryParam {
-	var arr []*WxMpUserQueryParam
-	for _, openid := range openidArr {
-		arr = append(arr, &WxMpUserQueryParam{
-			Openid: openid,
-		})
+type WxMpUserQuery struct {
+	queryParamList []*WxMpUserQueryParam
+}
+
+func (q *WxMpUserQuery) Add(openid string) *WxMpUserQuery {
+	q.queryParamList = append(q.queryParamList, &WxMpUserQueryParam{Openid: openid})
+	return q
+}
+
+func NewWxMpUserQuery(openidArr ...string) WxMpUserQuery {
+	query := WxMpUserQuery{}
+	for _, s := range openidArr {
+		query.Add(s)
 	}
-	return arr
+	return query
 }
 
 type WxMpUserList struct {
@@ -117,12 +125,15 @@ func (r *WxMpUserServiceImpl) UserUpdateRemark(openid, remark string) error {
 	return err
 }
 
-func (r *WxMpUserServiceImpl) GetUserInfo(openid string) (*WxMpUser, error) {
-
-	return r.GetUserInfoBy(openid, "")
+func (r *WxMpUserServiceImpl) GetUserInfo(openid string, lang ...string) (*WxMpUser, error) {
+	l := "zh_CN"
+	if len(lang) > 0 && strings.Trim(lang[0], "") != "" {
+		l = lang[0]
+	}
+	return r.getUserInfo(openid, l)
 }
 
-func (r *WxMpUserServiceImpl) GetUserInfoBy(openid, lang string) (*WxMpUser, error) {
+func (r *WxMpUserServiceImpl) getUserInfo(openid, lang string) (*WxMpUser, error) {
 
 	if lang == "" {
 		lang = "zh_CN"
@@ -133,15 +144,15 @@ func (r *WxMpUserServiceImpl) GetUserInfoBy(openid, lang string) (*WxMpUser, err
 	return &data, err
 }
 
-func (r *WxMpUserServiceImpl) GetUserInfoList(openidArr ...string) ([]*WxMpUser, error) {
+func (r *WxMpUserServiceImpl) GetUserInfos(openidArr ...string) ([]*WxMpUser, error) {
 
-	return r.GetUserInfoListBy(GetWxMpUserQueryParam(openidArr...))
+	return r.GetUserInfosWithQuery(NewWxMpUserQuery(openidArr...))
 }
 
-func (r *WxMpUserServiceImpl) GetUserInfoListBy(arr []*WxMpUserQueryParam) ([]*WxMpUser, error) {
+func (r *WxMpUserServiceImpl) GetUserInfosWithQuery(query WxMpUserQuery) ([]*WxMpUser, error) {
 
 	data := map[string][]*WxMpUserQueryParam{
-		"user_list": arr,
+		"user_list": query.queryParamList,
 	}
 
 	var res []*WxMpUser

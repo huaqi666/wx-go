@@ -1,6 +1,6 @@
 package mp
 
-// 永久图文消息素材
+// WxMaterialNewsBatchGetNewsItem 永久图文消息素材
 type WxMaterialNewsBatchGetNewsItem struct {
 	MediaId    string           `json:"media_id"`
 	UpdateTime string           `json:"update_time"`
@@ -27,7 +27,7 @@ type WxMpNewsArticle struct {
 	OnlyFansCanComment bool   `json:"only_fans_can_comment"`
 }
 
-// 永久媒体消息素材
+// WxMaterialFileBatchGetNewsItem 永久媒体消息素材
 type WxMaterialFileBatchGetNewsItem struct {
 	MediaId    string `json:"media_id"`
 	UpdateTime string `json:"update_time"`

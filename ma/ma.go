@@ -202,7 +202,7 @@ func JsCode2SessionInfo(appId, secret, jsCode string) (*WxMaJsCode2SessionResult
 }
 
 // 创建调用jsapi时所需要的签名.
-func CreateJsapiSignatureBy(appId, secret, url string) (*common.WxJsapiSignature, error) {
+func CreateJsapiSignatureOnce(appId, secret, url string) (*common.WxJsapiSignature, error) {
 	return NewWxMaServiceBy(appId, secret).GetWxMaJsapiService().CreateJsapiSignature(url)
 }
 

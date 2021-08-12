@@ -2,11 +2,10 @@ package mp
 
 import (
 	"github.com/cliod/wx-go/common"
-	"github.com/cliod/wx-go/common/util"
 )
 
 func CheckSignature(token, timestamp, nonce, signature string) bool {
-	return util.CheckSignature(token, timestamp, nonce, signature)
+	return common.CheckSignature(token, timestamp, nonce, signature)
 }
 
 func CreateJsapiSignature(url, appId, ticket string) (*common.WxJsapiSignature, error) {

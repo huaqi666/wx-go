@@ -19,7 +19,7 @@ func TestGetAccessToken(t *testing.T) {
 		t.Logf("token是 %s ", at.AccessToken)
 	}
 
-	ws, err := CreateJsapiSignatureBy(appId, secret, "https://www.xxx.com")
+	ws, err := CreateJsapiSignatureOnce(appId, secret, "https://www.xxx.com")
 	if err != nil {
 		t.Log(err)
 	} else {
@@ -53,7 +53,7 @@ func TestCreateJsapiSignatureBy(t *testing.T) {
 	appId := c.Ma.AppId
 	secret := c.Ma.Secret
 
-	got, err := CreateJsapiSignatureBy(appId, secret, "")
+	got, err := CreateJsapiSignatureOnce(appId, secret, "")
 	t.Log(got, err)
 
 }
@@ -279,7 +279,7 @@ func TestWxMaUserServiceImpl_GetPhoneNoInfo(t *testing.T) {
 
 	service := NewWxMaServiceBy(appId, secret)
 
-	res, err := service.GetWxMaUserService().GetPhoneNoInfo("", "", "")
+	res, err := service.GetWxMaUserService().GetPhoneInfo("", "", "")
 	t.Log(res, err)
 }
 

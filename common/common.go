@@ -6,10 +6,16 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/cliod/wx-go/common/util"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 )
+
+type HttpRequest interface {
+	Get(url string) (*http.Response, error)
+	Post(url, contentType string, body io.Reader) (*http.Response, error)
+}
 
 // Service http请求接口
 type Service interface {
@@ -26,12 +32,12 @@ type Service interface {
 
 // ServiceImpl http请求默认实现(json传参)
 type ServiceImpl struct {
-	client *http.Client
+	*http.Client
 }
 
 func (s *ServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
-	res, err := s.client.Get(uri)
+	res, err := s.Client.Get(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +47,7 @@ func (s *ServiceImpl) Get(url string, args ...interface{}) ([]byte, error) {
 func (s *ServiceImpl) Post(url string, contentType string, data interface{}, args ...interface{}) ([]byte, error) {
 	uri := fmt.Sprintf(url, args...)
 	body, err := json.Marshal(data)
-	res, err := s.client.Post(uri, contentType, bytes.NewReader(body))
+	res, err := s.Client.Post(uri, contentType, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -119,9 +125,7 @@ func NewService() Service {
 }
 
 func NewServiceFor(client *http.Client) Service {
-	return &ServiceImpl{
-		client: client,
-	}
+	return &ServiceImpl{client}
 }
 
 func NewXmlService() Service {
@@ -129,7 +133,5 @@ func NewXmlService() Service {
 }
 
 func NewXmlServiceFor(client *http.Client) Service {
-	return &XmlServiceImpl{
-		client: client,
-	}
+	return &XmlServiceImpl{client: client}
 }

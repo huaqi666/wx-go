@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+func CheckSignature(token, timestamp, nonce, signature string) bool {
+	return util.CheckSignature(token, timestamp, nonce, signature)
+}
+
 func CreateJsapiSignature(url, appId, ticket string) (*WxJsapiSignature, error) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	randomStr := util.RandSeq(16)

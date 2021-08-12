@@ -3,11 +3,11 @@ package mp
 import "github.com/cliod/wx-go/common"
 
 type WxMpQrcodeService interface {
-	// 换取临时二维码ticket
+	// QrcodeCreateTmpTicket 换取临时二维码ticket
 	// 详情请见: https://mp.weixin.qq.com/wiki?action=doc&id=mp1443433542&t=0.9274944716856435
 	// sceneStr 和 sceneId 二选一就行
 	QrcodeCreateTmpTicket(actionName ActionName, sceneStr string, sceneId, expireSeconds int64) (*WxMpQrCodeTicket, error)
-	// 换取永久二维码ticket
+	// QrcodeCreateLastTicket 换取永久二维码ticket
 	// 详情请见: https://mp.weixin.qq.com/wiki?action=doc&id=mp1443433542&t=0.9274944716856435
 	QrcodeCreateLastTicket(actionName ActionName, sceneStr string, sceneId, expireSeconds int64) (*WxMpQrCodeTicket, error)
 }

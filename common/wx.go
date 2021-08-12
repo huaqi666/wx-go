@@ -46,39 +46,38 @@ type WxTicket interface {
 type WxJsapi interface {
 	// GetJsapiTicket 获得jsapi_ticket,不强制刷新jsapi_ticket.
 	GetJsapiTicket() (*Ticket, error)
-	// ForceGetJsapiTicket
-	/* 获得jsapi_ticket.
-	   获得时会检查jsapiToken是否过期，如果过期了，那么就刷新一下，否则就什么都不干
-	   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN */
+	// ForceGetJsapiTicket 获得jsapi_ticket.
+	//   获得时会检查jsapiToken是否过期，如果过期了，那么就刷新一下，否则就什么都不干
+	//   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN
 	ForceGetJsapiTicket(bool) (*Ticket, error)
 	// GetTicket 获得ticket,不强制刷新ticket.
 	GetTicket(TicketType) (*Ticket, error)
 	// ForceGetTicket 获得时会检查 Token是否过期，如果过期了，那么就刷新一下，否则就什么都不干
 	ForceGetTicket(ticketType TicketType, forceRefresh bool) (*Ticket, error)
 	// CreateJsapiSignature
-	/* 创建调用jsapi时所需要的签名.
-	   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN */
+	//   创建调用jsapi时所需要的签名.
+	//   详情请见：http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141115&token=&lang=zh_CN
 	CreateJsapiSignature(url string) (*WxJsapiSignature, error)
 }
 
 // WxService wxAPI，获取accessToken，配置管理
 type WxService interface {
 	Service
-	// 获取access_token
+	// GetAccessToken 获取access_token
 	GetAccessToken() (*AccessToken, error)
-	// 是否强制获取access_token
+	// ForceGetAccessToken 是否强制获取access_token
 	ForceGetAccessToken(forceRefresh bool) (*AccessToken, error)
 
-	// 配置读取
+	// GetWxConfig 配置读取
 	GetWxConfig() WxConfig
-	// 配置设置
+	// SetWxConfig 配置设置
 	SetWxConfig(WxConfig)
 
-	// 设置http请求方式
+	// SetHttpService 设置http请求方式
 	SetHttpService(Service)
 }
 
-// http请求默认实现
+// WxServiceImpl http请求默认实现
 type WxServiceImpl struct {
 	// 配置
 	config WxConfig
